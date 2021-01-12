@@ -1,0 +1,18 @@
+{
+    "locations": [
+        {
+            "name" : "Mediterranean Avenue",
+            "id" : "1",
+            "color" : "brown",
+            "cost" : "60",
+            "rent" : "2",
+            "rent1" : "10",
+            "rent2" : "30",
+            "rent3" : "90",
+            "rent4" : "160",
+            "rent5" : "250",
+            "house_price" : "50",
+            "hotel_price" : "50"
+        }
+    ]
+}
