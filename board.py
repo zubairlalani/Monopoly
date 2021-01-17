@@ -26,7 +26,7 @@ class Location:
         self.color = color
         self.cost = cost
         self.rent = rent
-        self.house_amnt = house_amnt
+        self.house_amnt = house_amnts
         self.is_property = is_property
         
     def get_id(self):

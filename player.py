@@ -9,19 +9,30 @@ class Player:
         self.position = 0
         self.x = x
         self.y = y
-         
+                 
     def move(self, dice_roll):
+        temp_pos = self.position
         self.position += dice_roll
         self.position = self.position % 40
-        if self.position <= 10 :
-            self.x += dice_roll * 70 * -1
-        elif self.position > 10 and self.position <= 20 :
-            self.y += dice_roll * 70 * -1
-        elif self.position > 20 and self.position <= 30 :
-            self.x += dice_roll * 70 
-        elif self.position > 30 and self.position <= 40 :
-            self.y += dice_roll * 70 
+        while temp_pos != self.position:
+            if temp_pos < 10:
+                self.x += 56 * -1
+                self.y = 670
+            elif temp_pos >= 10 and temp_pos < 20:
+                self.y += 56 * -1
+                self.x = 70
+            elif temp_pos >= 20 and temp_pos < 30:
+                self.x += 56
+                self.y = 90
+            elif temp_pos >= 30 and temp_pos <= 40:
+                self.y += 56
+                self.x = 640
+            temp_pos += 1
+            temp_pos = temp_pos % 40
     
+    def add_property(self, property_id):
+        self.properties.append(property_id)
+        
     def make_deposit(self, amount):
         self.money += amount
     

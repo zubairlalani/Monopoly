@@ -1,6 +1,10 @@
 {
     "locations": [
         {
+            "id" : "0",
+            "name" : "GO"
+        },
+        {
             "name" : "Mediterranean Avenue",
             "id" : "1",
             "color" : "brown",
@@ -12,7 +16,115 @@
             "rent4" : "160",
             "rent5" : "250",
             "house_price" : "50",
-            "hotel_price" : "50"
+            "hotel_price" : "50",
+            "mortgage" : "30"
+        },
+        {
+            "id" : "2",
+            "name" : "Community Chest"
+        },
+        {
+            "id" : "3",
+            "name" : "Baltic Avenue",
+            "color" : "brown",
+            "cost" : "60",
+            "rent" : "4",
+            "rent1" : "20",
+            "rent2" : "60",
+            "rent3" : "180",
+            "rent4" : "320",
+            "rent5" : "450",
+            "house_price" : "50",
+            "hotel_price" : "50",
+            "mortgage" : "30"
+        },
+        {
+            "id" : "4",
+            "name" : "Tax",
+            "cost" : "200"
+        },
+        {
+            "id" : "5",
+            "name" : "Reading Railroad",
+            "cost" : "200",
+            "rent" : "25",
+            "rent1" : "50",
+            "rent2" : "100",
+            "rent3" : "200",
+            "mortgage" : "100"
+        },
+        {
+            "id" : "6",
+            "name" : "Oriental Avenue",
+            "color" : "Light Blue",
+            "Cost" : "100",
+            "rent" : "6",
+            "rent1" : "30",
+            "rent2" : "90",
+            "rent3" : "270",
+            "rent4" : "400",
+            "rent5" : "550",
+            "house_price" : "50",
+            "hotel_price" : "50",
+            "mortgage" : "50"
+        },
+        {
+            "id" : "7",
+            "name" : "Chance"
+        },
+        {
+            "id" : "8",
+            "name" : "Vermont Avenue",
+            "color" : "Light Blue",
+            "Cost" : "100",
+            "rent" : "6",
+            "rent1" : "30",
+            "rent2" : "90",
+            "rent3" : "270",
+            "rent4" : "400",
+            "rent5" : "550",
+            "house_price" : "50",
+            "hotel_price" : "50",
+            "mortgage" : "50"
+        },
+        {
+            "id" : "9",
+            "name" : "Connecticut Avenue",
+            "color" : "Light Blue",
+            "Cost" : "120",
+            "rent" : "8",
+            "rent1" : "40",
+            "rent2" : "100",
+            "rent3" : "300",
+            "rent4" : "450",
+            "rent5" : "600",
+            "house_price" : "50",
+            "hotel_price" : "50",
+            "mortgage" : "60"
+        },
+        {
+            "id" : "10",
+            "name" : "Jail"
+        },
+        {
+            "id" : "11",
+            "name" : "St. Charles Place",
+            "color" : "Pink",
+            "Cost" : "140",
+            "rent" : "10",
+            "rent1" : "50",
+            "rent2" : "150",
+            "rent3" : "450",
+            "rent4" : "625",
+            "rent5" : "750",
+            "house_price" : "100",
+            "hotel_price" : "100",
+            "mortgage" : "70"
+        },
+        {
+            "id" : "12",
+            "name" : "Electric Company",
+            "mortgage" : "75"
         }
     ]
 }
