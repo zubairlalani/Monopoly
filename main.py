@@ -27,6 +27,7 @@ CAR_WIDTH, CAR_HEIGHT = 50, 50
 START_X, START_Y = 640, 670
 BOARD_IMAGE = pygame.image.load(os.path.join('Assets', 'monopoly.jpg'))
 CAR = pygame.image.load(os.path.join('Assets', 'car.png'))
+properties = [pygame.image.load(os.path.join('Assets', 'oriental_avenue.jpg')), pygame.image.load(os.path.join('Assets', 'vermont_avenue.jpg'))]
 
 
 board_rect = BOARD_IMAGE.get_rect()
@@ -117,6 +118,10 @@ def draw_window():
     die.draw_dice()
     buy_button.draw()
     
+    if car.get_position() == 6:
+        WINDOW.blit(properties[0], (775, 60))
+    elif car.get_position() == 8:
+        WINDOW.blit(properties[1], (775, 60))
     pygame.display.flip()
 
 def main():
@@ -135,7 +140,11 @@ def main():
                         roll_button.release()
                         
                     elif buy_button.is_clicked(event):
-                        car.add_property(car.get_position())
+                        loc = property_dict["locations"][car.get_position()]["name"]
+                        if loc != "GO" \
+                        and loc != "Community Chest" and loc != "Chance" \
+                        and loc != "Tax" and loc != "Jail" and loc != "Free Parking" and loc != "Cop":
+                            car.add_property(car.get_position())
                         print(car.get_properties())
                         
             elif event.type == pygame.QUIT:
