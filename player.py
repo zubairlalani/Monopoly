@@ -30,8 +30,9 @@ class Player:
             temp_pos += 1
             temp_pos = temp_pos % 40
     
-    def add_property(self, property_id):
+    def buy_property(self, property_id, price):
         self.properties.append(property_id)
+        self.money -= price
         
     def make_deposit(self, amount):
         self.money += amount

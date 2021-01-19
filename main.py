@@ -132,6 +132,7 @@ class Dice:
     
 roll_button = Button('Roll', 30, pygame.Rect(1080, 200, 100, 60), BUTTON_COLOR)
 buy_button = Button('Buy', 30, pygame.Rect(1080, 280, 100, 60), BUTTON_COLOR)
+trade_button = Button("Trade", 30, pygame.Rect(1080, 360, 100, 60), BUTTON_COLOR)
 die = Dice(pygame.Rect(1100, 50, 60, 60), pygame.Rect(1100, 120, 60, 60), BUTTON_COLOR, 30)
 
 def draw_text(text, x, y):
@@ -150,6 +151,7 @@ def draw_window():
     roll_button.draw()
     die.draw_dice()
     buy_button.draw()
+    trade_button.draw()
     
     if car.get_position() in properties:
         WINDOW.blit(properties[car.get_position()], (775, 60))
@@ -178,7 +180,7 @@ def main():
                         if loc != "GO" \
                         and loc != "Community Chest" and loc != "Chance" \
                         and loc != "Tax" and loc != "Jail" and loc != "Free Parking" and loc != "Cop":
-                            car.add_property(car.get_position())
+                            car.buy_property(car.get_position(), property_dict["locations"][car.get_position()]["cost"])
                         print(car.get_properties())
                         
             elif event.type == pygame.QUIT:
