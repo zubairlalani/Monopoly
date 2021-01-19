@@ -27,7 +27,36 @@ CAR_WIDTH, CAR_HEIGHT = 50, 50
 START_X, START_Y = 640, 670
 BOARD_IMAGE = pygame.image.load(os.path.join('Assets', 'monopoly.jpg'))
 CAR = pygame.image.load(os.path.join('Assets', 'car.png'))
-properties = [pygame.image.load(os.path.join('Assets', 'oriental_avenue.jpg')), pygame.image.load(os.path.join('Assets', 'vermont_avenue.jpg'))]
+properties = dict({
+                1 : pygame.image.load(os.path.join('Assets', 'mediterranean_avenue.png')),
+                3 : pygame.image.load(os.path.join('Assets', 'baltic_avenue.jpg')),
+                5 : pygame.image.load(os.path.join('Assets', 'reading_railroad.jpg')),
+                6 : pygame.image.load(os.path.join('Assets', 'oriental_avenue.jpg')),
+                8 : pygame.image.load(os.path.join('Assets', 'vermont_avenue.jpg')),
+                9 : pygame.image.load(os.path.join('Assets', 'connecticut_avenue.jpg')),
+                11 : pygame.image.load(os.path.join('Assets', 'st_charles_place.jpg')),
+                12 : pygame.image.load(os.path.join('Assets', 'electric_company.jpg')),
+                13 : pygame.image.load(os.path.join('Assets', 'states_avenue.jpg')),
+                14 : pygame.image.load(os.path.join('Assets', 'virginia_avenue.jpg')),
+                15 : pygame.image.load(os.path.join('Assets', 'pennsylvania_railroad.jpg')),
+                16 : pygame.image.load(os.path.join('Assets', 'st_james_place.jpg')),
+                18 : pygame.image.load(os.path.join('Assets', 'tennessee_avenue.jpg')),
+                19 : pygame.image.load(os.path.join('Assets', 'new_york_avenue.jpg')),
+                21 : pygame.image.load(os.path.join('Assets', 'kentucky_avenue.jpg')),
+                23 : pygame.image.load(os.path.join('Assets', 'indiana_avenue.jpg')),
+                24 : pygame.image.load(os.path.join('Assets', 'illinois_avenue.jpg')),
+                25 : pygame.image.load(os.path.join('Assets', 'b&o_railroad.jpg')),
+                26 : pygame.image.load(os.path.join('Assets', 'atlantic_avenue.jpg')),
+                27 : pygame.image.load(os.path.join('Assets', 'ventnor_avenue.jpg')),
+                28 : pygame.image.load(os.path.join('Assets', 'water_works.jpg')),
+                29 : pygame.image.load(os.path.join('Assets', 'marvin_gardens.jpg')),
+                31 : pygame.image.load(os.path.join('Assets', 'pacific_avenue.jpg')),
+                32 : pygame.image.load(os.path.join('Assets', 'north_carolina_avenue.jpg')),
+                34 : pygame.image.load(os.path.join('Assets', 'pennsylvania_avenue.jpg')),
+                35 : pygame.image.load(os.path.join('Assets', 'short_line_railroad.jpg')),
+                37 : pygame.image.load(os.path.join('Assets', 'park_place.jpg')),
+                39 : pygame.image.load(os.path.join('Assets', 'boardwalk.jpg')),
+            })
 
 
 board_rect = BOARD_IMAGE.get_rect()
@@ -105,23 +134,28 @@ roll_button = Button('Roll', 30, pygame.Rect(1080, 200, 100, 60), BUTTON_COLOR)
 buy_button = Button('Buy', 30, pygame.Rect(1080, 280, 100, 60), BUTTON_COLOR)
 die = Dice(pygame.Rect(1100, 50, 60, 60), pygame.Rect(1100, 120, 60, 60), BUTTON_COLOR, 30)
 
+def draw_text(text, x, y):
+    text_surface = FONT.render(text, True, WHITE)
+    text_rect = text_surface.get_rect()
+    text_rect.center = (x, y)
+    WINDOW.blit(text_surface, text_rect)
+    
 def draw_window():
     WINDOW.fill(BLACK)
 
     WINDOW.blit(BOARD_IMAGE, board_rect)
     WINDOW.blit(CAR, (car.get_x(), car.get_y()))
     
-    #WINDOW.blit(textsurface,(BOARD_IMAGE.get_width() + 100,100)) # drawing player info
-    #WINDOW.blit(textsurface2,(BOARD_IMAGE.get_width() + 100,120))
     
     roll_button.draw()
     die.draw_dice()
     buy_button.draw()
     
-    if car.get_position() == 6:
-        WINDOW.blit(properties[0], (775, 60))
-    elif car.get_position() == 8:
-        WINDOW.blit(properties[1], (775, 60))
+    if car.get_position() in properties:
+        WINDOW.blit(properties[car.get_position()], (775, 60))
+    
+    draw_text("Player 1: ", 800, 700)
+    draw_text("$"+str(car.get_money()), 870, 700)
     pygame.display.flip()
 
 def main():
