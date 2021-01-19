@@ -6,6 +6,7 @@ import random
 from player import Player
 from board import Board
 import pygame_textinput
+import option_box as ob
 
 WIDTH, HEIGHT = 1200, 800
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -87,7 +88,7 @@ class Button:
         self.clicked = False
         
     def draw(self):
-        pygame.draw.rect(WINDOW, self.color, self.rect)
+        pygame.draw.rect(WINDOW, self.color, self.rect, border_radius=10)
         WINDOW.blit(self.surface, self.text_rect)
     
     def release(self):
@@ -165,11 +166,18 @@ class Dice:
 roll_button = Button('Roll', 30, pygame.Rect(1080, 200, 100, 60), BUTTON_COLOR)
 buy_button = Button('Buy', 30, pygame.Rect(1080, 280, 100, 60), BUTTON_COLOR)
 trade_button = Button("Trade", 30, pygame.Rect(1080, 360, 100, 60), BUTTON_COLOR)
+build_button = Button("Build", 30, pygame.Rect(1080, 440, 100, 60), BUTTON_COLOR)
+end_turn_button = Button("End Turn", 30, pygame.Rect(1080, 520, 100, 60), BUTTON_COLOR)
 trade_box = TextBox("", 12, WHITE, BUTTON_COLOR, pygame.Rect(950, 370, 110, 30), True)
 trade_box2 = TextBox("", 12, WHITE, BUTTON_COLOR, pygame.Rect(760, 370, 110, 30), True)
 textbox = pygame_textinput.TextInput("", font_size=20, text_color=WHITE, cursor_color=ORANGE)
 textbox2 = pygame_textinput.TextInput("", font_size=20, text_color=WHITE, cursor_color=ORANGE)
+player_option = ob.OptionBox(
+    760, 435, 310, 30, (150, 150, 150), (100, 200, 255), FONT, 
+    ["Car", "Ship", "Shoe"])
+
 die = Dice(pygame.Rect(1100, 50, 60, 60), pygame.Rect(1100, 120, 60, 60), BUTTON_COLOR, 30)
+
 
 def draw_text(text, x, y):
     text_surface = FONT.render(text, True, WHITE)
@@ -182,6 +190,12 @@ arrow_offset_x = 900
 arrow_offset_y = 365
 arrowscale = 8
 
+def draw_player_info():
+    pygame.draw.rect(WINDOW, WHITE, (760, 435, 310, 300), 2)
+    #pygame.draw.line(WINDOW, WHITE, (760, 435+75), (760+420, 435+75), width=2)
+    #pygame.draw.line(WINDOW, WHITE, (760, 435+75+75), (760+420, 435+75+75), width=2)
+    #pygame.draw.line(WINDOW, WHITE, (760, 435+75+75+75), (760+420, 435+75+75+75), width=2)
+    
 def draw_window():
     WINDOW.fill(BLACK)
 
@@ -193,6 +207,10 @@ def draw_window():
     die.draw_dice()
     buy_button.draw()
     trade_button.draw()
+    build_button.draw()
+    end_turn_button.draw()
+    player_option.draw(WINDOW)
+    
     #trade_box.draw()
     #trade_box2.draw()
     
@@ -200,9 +218,6 @@ def draw_window():
     WINDOW.blit(textbox2.get_surface(), (760, 400 - textbox2.get_fontsize()))
     if car.get_position() in properties:
         WINDOW.blit(properties[car.get_position()], (775, 60))
-    
-    draw_text("Player 1: ", 800, 700)
-    draw_text("$"+str(car.get_money()), 870, 700)
     
     pygame.draw.polygon(WINDOW, WHITE, 
                         (
@@ -217,13 +232,13 @@ def draw_window():
                          (200/arrowscale+arrow_offset_x, 100/arrowscale+ arrow_offset_y)))
     pygame.draw.line(WINDOW, WHITE, (950, 400), (950+115, 400), width=4)
     pygame.draw.line(WINDOW, WHITE, (760, 400), (760+115, 400), width=4)
+    
+    draw_player_info()
     pygame.display.flip()
 
 def main():
     clock = pygame.time.Clock()
     run = True
-    user_input = ""
-    validChars = "`1234567890-=qwertyuiop[]\\asdfghjkl;'zxcvbnm,./"
     
     while run:
         clock.tick(FPS)
@@ -247,7 +262,6 @@ def main():
                     elif trade_box.is_clicked(event):
                         trade_box.toggle(True)
                     elif trade_box2.is_clicked(event):
-                        print("hello")
                         trade_box2.toggle(True)  
             
             elif event.type == pygame.KEYDOWN:
@@ -264,6 +278,11 @@ def main():
             textbox.update(events)
         elif trade_box2.is_active():
             textbox2.update(events)
+        
+        selected_option = player_option.update(events)
+        if selected_option >= 0:
+            print(selected_option)
+            
         draw_window()
         
     pygame.quit()
