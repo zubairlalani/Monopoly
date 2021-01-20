@@ -6,7 +6,7 @@
         },
         {
             "name" : "Mediterranean Avenue",
-            "id" : "1",
+            "id" : 1,
             "color" : "brown",
             "cost" : 60,
             "rent" : "2",
@@ -24,7 +24,7 @@
             "name" : "Community Chest"
         },
         {
-            "id" : "3",
+            "id" : 3,
             "name" : "Baltic Avenue",
             "color" : "brown",
             "cost" : 60,
@@ -46,6 +46,7 @@
         {
             "id" : "5",
             "name" : "Reading Railroad",
+            "color" : "RR",
             "cost" : 200,
             "rent" : "25",
             "rent1" : "50",
@@ -124,6 +125,7 @@
         {
             "id" : "12",
             "name" : "Electric Company",
+            "color" : "Utility",
             "cost" : 150,
             "mortgage" : "75"
         },
@@ -160,6 +162,7 @@
         {
             "id" : "15",
             "name" : "Pennsylvania Railroad",
+            "color" : "RR",
             "cost" : 200,
             "rent" : "25",
             "rent1" : "50",
@@ -237,7 +240,7 @@
         },
         {
             "id" : "22",
-            "Name" : "Chance"
+            "name" : "Chance"
         },
         {
             "id" : "23",
@@ -272,6 +275,7 @@
         {
             "id" : "25",
             "name" : "B. & O. Railroad",
+            "color" : "RR",
             "cost" : 200,
             "rent" : "25",
             "rent1" : "50",
@@ -312,6 +316,8 @@
         {
             "id" : "28",
             "name" : "Water Works",
+            "cost" : 150,
+            "color" : "Utility",
             "mortgage" : "75"
         },
         {
@@ -385,6 +391,7 @@
         {
             "id" : "35",
             "name" : "Short Line",
+            "color" : "RR",
             "cost" : 200,
             "rent" : "25",
             "rent1" : "50",

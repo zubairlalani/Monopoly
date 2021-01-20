@@ -1,11 +1,12 @@
-
-"""[summary] Single player for a monopoly game
-"""
 class Player:
+    """Single player for a monopoly game
+    """
+    
     def __init__(self, name, money, x, y):
         self.name = name
         self.money = money
-        self.properties = []
+        self.properties = set()
+        self.color_frequency = {}
         self.position = 0
         self.x = x
         self.y = y
@@ -30,11 +31,19 @@ class Player:
             temp_pos += 1
             temp_pos = temp_pos % 40
     
-    def buy_property(self, property_id, price):
-        if self.money - price >= 0:
-            self.properties.append(property_id)
+    def buy_property(self, property_id, property_color, price):
+        if self.money - price >= 0 and property_id not in self.properties:
+            self.properties.add(property_id)
+            if property_color in self.color_frequency:
+                self.color_frequency[property_color] += 1
+            else:
+                self.color_frequency[property_color] = 1
+            
             self.money -= price
-        
+    
+    def property_owned(self, property_id):
+        return property_id in self.properties
+    
     def make_deposit(self, amount):
         self.money += amount
     
@@ -50,6 +59,9 @@ class Player:
     def get_properties(self):
         return self.properties
 
+    def get_color_frequency(self):
+        return self.color_frequency
+    
     def get_name(self):
         return self.name
     
