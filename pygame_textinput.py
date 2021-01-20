@@ -4,8 +4,6 @@ Copyright 2017, Silas Gyger, silasgyger@gmail.com, All rights reserved.
 Borrowed from https://github.com/Nearoo/pygame-text-input under the MIT license.
 """
 
-import os.path
-
 import pygame
 import pygame.locals as pl
 
@@ -21,7 +19,6 @@ class TextInput:
     def __init__(
             self,
             initial_string="",
-            font_family="",
             font_size=35,
             antialias=True,
             text_color=(0, 0, 0),
@@ -29,6 +26,7 @@ class TextInput:
             repeat_keys_initial_ms=400,
             repeat_keys_interval_ms=35,
             max_string_length=-1,
+            rect=pygame.Rect(0, 0, 0, 0),
             password=False):
         """
         :param initial_string: Initial text to be displayed
@@ -49,13 +47,8 @@ class TextInput:
         self.max_string_length = max_string_length
         self.password = password
         self.input_string = initial_string  # Inputted text
-
-        '''
-        if not os.path.isfile(font_family):
-            font_family = pygame.font.match_font(font_family)
-
-        self.font_object = pygame.font.Font(font_family, font_size)
-        '''
+        self.rect = rect
+        self.enabled = False
         
         self.font_object = pygame.font.Font(None, font_size)
 
@@ -169,6 +162,17 @@ class TextInput:
         self.clock.tick()
         return False
 
+    def is_clicked(self, event):
+        if self.rect.collidepoint(event.pos):
+            return True
+        return False
+    
+    def set_enabled(self, state):
+        self.enabled = state
+    
+    def is_enabled(self):
+        return self.enabled
+            
     def get_surface(self):
         return self.surface
 
@@ -190,30 +194,3 @@ class TextInput:
     def clear_text(self):
         self.input_string = ""
         self.cursor_position = 0
-
-
-
-if __name__ == "__main__":
-    pygame.init()
-
-    # Create TextInput-object
-    textinput = TextInput()
-
-    screen = pygame.display.set_mode((1000, 200))
-    clock = pygame.time.Clock()
-
-    while True:
-        screen.fill((225, 225, 225))
-
-        events = pygame.event.get()
-        for event in events:
-            if event.type == pygame.QUIT:
-                exit()
-
-        # Feed it with events every frame
-        textinput.update(events)
-        # Blit its surface onto the screen
-        screen.blit(textinput.get_surface(), (10, 10))
-
-        pygame.display.update()
-        clock.tick(30)

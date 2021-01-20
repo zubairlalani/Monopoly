@@ -7,6 +7,7 @@ from player import Player
 from board import Board
 import pygame_textinput
 import option_box as ob
+import gui_components as gui
 
 WIDTH, HEIGHT = 1200, 800
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -75,59 +76,6 @@ with open('board_data.json') as json_file:
     print(property_dict["locations"][0])
 
 car = Player("Car", 1500, START_X, START_Y)
-
-class Button:
-    def __init__(self, text, fontsize, rect, color):
-        self.text = text
-        self.rect = rect
-        self.color = color
-        #buttonfont = pygame.font.SysFont('Comic Sans MS', fontsize)
-        self.surface = FONT.render(self.text, True, ORANGE)
-        self.text_rect = self.surface.get_rect()
-        self.text_rect.center = self.rect.center
-        self.clicked = False
-        
-    def draw(self):
-        pygame.draw.rect(WINDOW, self.color, self.rect, border_radius=10)
-        WINDOW.blit(self.surface, self.text_rect)
-    
-    def release(self):
-        self.clicked = False
-    
-    def is_clicked(self, event):
-        if self.rect.collidepoint(event.pos):
-            return True
-        return False
-        
-class TextBox(Button):
-    def __init__(self, text, fontsize, textcolor, boxcolor, rect, mode):
-        self.text = text
-        self.rect = rect
-        self.fontsize = fontsize
-        self.textcolor = textcolor
-        self.boxcolor = boxcolor
-        self.mode = mode
-        
-        self.surface = FONT.render(self.text, True, ORANGE)
-        self.text_rect = self.surface.get_rect()
-        self.text_rect.center = self.rect.center
-        self.clicked = False
-    
-    def draw(self):
-        pygame.draw.rect(WINDOW, self.boxcolor, self.rect, 2)
-        WINDOW.blit(self.surface, self.text_rect)
-    
-    def update_text(self, text):
-        self.surface = FONT.render(text, True, self.textcolor)
-    
-    def toggle(self, state):
-        self.clicked = state
-    
-    def is_active(self):
-        return self.clicked
-    
-    def get_rect(self):
-        return self.rect
     
         
 class Dice:
@@ -163,17 +111,15 @@ class Dice:
     def get_rollsum(self):
         return int(self.dice_one) + int(self.dice_two)
     
-roll_button = Button('Roll', 30, pygame.Rect(1080, 200, 100, 60), BUTTON_COLOR)
-buy_button = Button('Buy', 30, pygame.Rect(1080, 280, 100, 60), BUTTON_COLOR)
-trade_button = Button("Trade", 30, pygame.Rect(1080, 360, 100, 60), BUTTON_COLOR)
-build_button = Button("Build", 30, pygame.Rect(1080, 440, 100, 60), BUTTON_COLOR)
-mortgage_button = Button("Mortgage", 30, pygame.Rect(1080, 520, 100, 60), BUTTON_COLOR)
-analysis_button = Button("Analysis", 30, pygame.Rect(1080, 600, 100, 60), BUTTON_COLOR)
-end_turn_button = Button("End Turn", 30, pygame.Rect(1080, 680, 100, 60), BUTTON_COLOR)
-trade_box = TextBox("", 12, WHITE, BUTTON_COLOR, pygame.Rect(950, 370, 110, 30), True)
-trade_box2 = TextBox("", 12, WHITE, BUTTON_COLOR, pygame.Rect(760, 370, 110, 30), True)
-textbox = pygame_textinput.TextInput("", font_size=20, text_color=WHITE, cursor_color=ORANGE)
-textbox2 = pygame_textinput.TextInput("", font_size=20, text_color=WHITE, cursor_color=ORANGE)
+roll_button = gui.Button(WINDOW, 'Roll', FONT, 30, ORANGE, pygame.Rect(1080, 200, 100, 60), BUTTON_COLOR)
+buy_button = gui.Button(WINDOW, 'Buy', FONT, 30, ORANGE, pygame.Rect(1080, 280, 100, 60), BUTTON_COLOR)
+trade_button = gui.Button(WINDOW, "Trade", FONT, 30, ORANGE, pygame.Rect(1080, 360, 100, 60), BUTTON_COLOR)
+build_button = gui.Button(WINDOW, "Build", FONT, 30, ORANGE, pygame.Rect(1080, 440, 100, 60), BUTTON_COLOR)
+mortgage_button = gui.Button(WINDOW, "Mortgage", FONT, 30, ORANGE, pygame.Rect(1080, 520, 100, 60), BUTTON_COLOR)
+analysis_button = gui.Button(WINDOW, "Analysis", FONT, 30, ORANGE, pygame.Rect(1080, 600, 100, 60), BUTTON_COLOR)
+end_turn_button = gui.Button(WINDOW, "End Turn", FONT, 30, ORANGE, pygame.Rect(1080, 680, 100, 60), BUTTON_COLOR)
+textbox = pygame_textinput.TextInput("", font_size=20, text_color=WHITE, cursor_color=ORANGE, max_string_length=18, rect=pygame.Rect(950, 370, 110, 30))
+textbox2 = pygame_textinput.TextInput("", font_size=20, text_color=WHITE, cursor_color=ORANGE, max_string_length=18, rect=pygame.Rect(760, 370, 110, 30))
 player_option = ob.OptionBox(
     760, 435, 310, 30, (150, 150, 150), (100, 200, 255), FONT, 
     ["Car", "Ship", "Shoe"])
@@ -184,7 +130,7 @@ die = Dice(pygame.Rect(1100, 50, 60, 60), pygame.Rect(1100, 120, 60, 60), BUTTON
 def draw_text(text, x, y):
     text_surface = FONT.render(text, True, WHITE)
     text_rect = text_surface.get_rect()
-    text_rect.center = (x, y)
+    text_rect.topleft = (x, y)
     WINDOW.blit(text_surface, text_rect)
 
 # drawings two sided arrow for trading
@@ -192,19 +138,30 @@ arrow_offset_x = 900
 arrow_offset_y = 365
 arrowscale = 8
 
-def draw_player_info():
-    pygame.draw.rect(WINDOW, WHITE, (760, 435, 310, 300), 2)
-    #pygame.draw.line(WINDOW, WHITE, (760, 435+75), (760+420, 435+75), width=2)
-    #pygame.draw.line(WINDOW, WHITE, (760, 435+75+75), (760+420, 435+75+75), width=2)
-    #pygame.draw.line(WINDOW, WHITE, (760, 435+75+75+75), (760+420, 435+75+75+75), width=2)
-    
-def draw_window():
+def draw_player_info(selected_option):
+    info_rect = pygame.Rect(760, 435, 310, 300)
+    pygame.draw.rect(WINDOW, WHITE, info_rect, 2)
+    if selected_option == 0:
+        draw_text("Wealth: $"+str(car.get_money()), info_rect.left, 475)
+        draw_text("Properties: ", info_rect.left, 510)
+
+     
+def draw(selected_option):
     WINDOW.fill(BLACK)
 
     WINDOW.blit(BOARD_IMAGE, board_rect)
     WINDOW.blit(CAR, (car.get_x(), car.get_y()))
     
+    draw_player_info(selected_option)
+    draw_widgets()
     
+    if car.get_position() in properties:
+        WINDOW.blit(properties[car.get_position()], (775, 60))
+    
+    draw_trading_area()
+    
+
+def draw_widgets():
     roll_button.draw()
     die.draw_dice()
     buy_button.draw()
@@ -213,16 +170,11 @@ def draw_window():
     mortgage_button.draw()
     analysis_button.draw()
     end_turn_button.draw()
-    player_option.draw(WINDOW)
-    
-    #trade_box.draw()
-    #trade_box2.draw()
-    
     WINDOW.blit(textbox.get_surface(), (950, 400 - textbox.get_fontsize()))
     WINDOW.blit(textbox2.get_surface(), (760, 400 - textbox2.get_fontsize()))
-    if car.get_position() in properties:
-        WINDOW.blit(properties[car.get_position()], (775, 60))
-    
+    player_option.draw(WINDOW)
+
+def draw_trading_area():
     pygame.draw.polygon(WINDOW, WHITE, 
                         (
                          (arrow_offset_x, 100/arrowscale + arrow_offset_y), (arrow_offset_x, arrow_offset_y), 
@@ -237,12 +189,11 @@ def draw_window():
     pygame.draw.line(WINDOW, WHITE, (950, 400), (950+115, 400), width=4)
     pygame.draw.line(WINDOW, WHITE, (760, 400), (760+115, 400), width=4)
     
-    draw_player_info()
-    pygame.display.flip()
-
 def main():
     clock = pygame.time.Clock()
     run = True
+    first = True
+    current_option = -1
     
     while run:
         clock.tick(FPS)
@@ -263,31 +214,37 @@ def main():
                         and loc != "Community Chest" and loc != "Chance" \
                         and loc != "Tax" and loc != "Jail" and loc != "Free Parking" and loc != "Cop":
                             car.buy_property(car.get_position(), property_dict["locations"][car.get_position()]["cost"])
-                    elif trade_box.is_clicked(event):
-                        trade_box.toggle(True)
-                    elif trade_box2.is_clicked(event):
-                        trade_box2.toggle(True)  
+                    
+                    elif textbox.is_clicked(event):
+                        textbox.set_enabled(True)
+                        
+                    elif textbox2.is_clicked(event):
+                        textbox2.set_enabled(True)  
+                    
             
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    if trade_box.is_active():
-                        trade_box.toggle(False)
-                    elif trade_box2.is_active():
-                        trade_box2.toggle(False)
+                    if textbox.is_enabled():
+                        textbox.set_enabled(False)
+                    elif textbox2.is_enabled():
+                        textbox2.set_enabled(False)
                     
             elif event.type == pygame.QUIT:
                 run = False
         
-        if trade_box.is_active():
+        if textbox.is_enabled():
             textbox.update(events)
-        elif trade_box2.is_active():
+        elif textbox2.is_enabled():
             textbox2.update(events)
         
         selected_option = player_option.update(events)
-        if selected_option >= 0:
-            print(selected_option)
-            
-        draw_window()
+        if selected_option == -1: # When the previous option is an actual option (not -1) it keeps selected_option as the previous option
+            selected_option = current_option
+        if selected_option != -1:
+            current_option = selected_option
+        
+        draw(selected_option)
+        pygame.display.flip()
         
     pygame.quit()
 
