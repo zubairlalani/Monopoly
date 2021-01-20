@@ -23,3 +23,9 @@ class Button:
         if self.rect.collidepoint(event.pos):
             return True
         return False
+    
+def draw_text(window, text, font, color, x, y):
+    text_surface = font.render(text, True, color)
+    text_rect = text_surface.get_rect()
+    text_rect.topleft = (x, y)
+    window.blit(text_surface, text_rect)
