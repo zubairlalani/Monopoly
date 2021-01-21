@@ -40,12 +40,13 @@ railroad_icon_rect = RAILROAD_IMAGE.get_rect()
 class Player:
     """Single player for a monopoly game
     """
-    
+    owned_properties = set()
     def __init__(self, name, money, x, y):
         self.name = name
         self.money = money
         self.properties = set()
         self.color_frequency = {}
+        
         self.position = 0
         self.x = x
         self.y = y
@@ -71,8 +72,9 @@ class Player:
             temp_pos = temp_pos % 40
     
     def buy_property(self, property_id, property_color, price):
-        if self.money - price >= 0 and property_id not in self.properties:
+        if self.money - price >= 0 and property_id not in Player.owned_properties:
             self.properties.add(property_id)
+            Player.owned_properties.add(property_id)
             if property_color in self.color_frequency:
                 self.color_frequency[property_color] += 1
             else:
@@ -108,7 +110,7 @@ class Player:
         return self.x
     
     def get_y(self):
-        return self.y 
+        return self.y
 
     def draw_player_properties(self, WINDOW):
         
@@ -151,8 +153,6 @@ class Player:
             pygame.draw.rect(WINDOW, PINK, pygame.Rect(ROW_ONE_END + 2*CARD_DIST, ROW_ONE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT))
         else:
             pygame.draw.rect(WINDOW, PINK, pygame.Rect(ROW_ONE_END + 2*CARD_DIST, ROW_ONE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT), 2)
-        
-        
         
         if self.property_owned(16): # St. James Place
             pygame.draw.rect(WINDOW, ORANGE, pygame.Rect(ROW_TWO_START, ROW_TWO_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT))
@@ -198,9 +198,6 @@ class Player:
             pygame.draw.rect(WINDOW, YELLOW, pygame.Rect(ROW_TWO_END + 2*CARD_DIST, ROW_TWO_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT))
         else:
             pygame.draw.rect(WINDOW, YELLOW, pygame.Rect(ROW_TWO_END + 2*CARD_DIST, ROW_TWO_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT), 2)
-        
-        
-        
         
         #UTILITIES
         if self.property_owned(12): # Electric Community

@@ -29,6 +29,7 @@ board_rect = BOARD_IMAGE.get_rect()
 board_rect.center = (BOARD_IMAGE.get_height()/2 + 50, WINDOW_HEIGHT/2)
 
 CAR = pygame.image.load(os.path.join('Assets', 'car.png'))
+SHOE = pygame.image.load(os.path.join('Assets', 'shoe.png'))
 START_X, START_Y = 640, 670 # Starting position of a player
 
 #Contains all property images mapped to their respective positions
@@ -66,7 +67,31 @@ property_images = dict({
 with open('src/board_data.json') as json_file:
     property_dict = json.load(json_file) # Contains all info about each property including name, rent, cost, etc
 
-   
+class GameEngine:
+    
+    def __init__(self, amount_of_players):
+        self.amount_of_players = amount_of_players
+        self.turn = 0
+        self.rollled = False # Determines which phase of a players turn (rolling, trading, etc)
+        self.doubles = 0 # Determines amount doubles rolled
+        self.dice_roll = 0 # Dice roll for a single turn
+    
+    def change_turn(self):
+        self.turn += 1
+        self.turn = self.turn % self.amount_of_players
+        
+    def get_turn(self):
+        return self.turn
+
+    def handle_event(self, events):
+        pass
+    
+    def check_player_pos(self):
+        pass
+    
+    def set_dice_roll(self, dice_roll):
+        self.dice_roll = dice_roll
+         
 class Dice:
     """Represents the die within the monopoly game and handles both drawing and rolling the die
     """
@@ -122,10 +147,13 @@ textbox = pygame_textinput.TextInput("", font_size=20, text_color=WHITE,
                                      cursor_color=ORANGE, max_string_length=18, rect=pygame.Rect(950, 370, 110, 30))
 textbox2 = pygame_textinput.TextInput("", font_size=20, text_color=WHITE,
                                       cursor_color=ORANGE, max_string_length=18, rect=pygame.Rect(760, 370, 110, 30))
-player_option = gui.OptionBox(760, 435, 310, 30, GREY, (100, 200, 255), FONT, ["Car", "Ship", "Shoe"])
+player_option = gui.OptionBox(760, 435, 310, 30, GREY, (100, 200, 255), FONT, ["Car", "Shoe", "Ship"])
 
 car = Player("Car", 40000, START_X, START_Y)
+shoe = Player("Shoe", 40000, START_X, START_Y)
+
 die = Dice(pygame.Rect(1100+30, 50, 60, 60), pygame.Rect(1100+30, 120, 60, 60), BUTTON_COLOR, 30)
+game = GameEngine(2)
 
 def draw_player_info(selected_option):
     info_rect = pygame.Rect(760, 435, 310, 300)
@@ -134,20 +162,27 @@ def draw_player_info(selected_option):
         gui.draw_text(WINDOW, "Wealth: $"+str(car.get_money()), FONT, WHITE, info_rect.left, 475)
         gui.draw_text(WINDOW, "Properties: ", FONT, WHITE, info_rect.left, 510)
         car.draw_player_properties(WINDOW)
-    
+    elif selected_option == 1:
+        gui.draw_text(WINDOW, "Wealth: $"+str(shoe.get_money()), FONT, WHITE, info_rect.left, 475)
+        gui.draw_text(WINDOW, "Properties: ", FONT, WHITE, info_rect.left, 510)
+        shoe.draw_player_properties(WINDOW)
+    elif selected_option == 2:
+        pass
    
 def draw(selected_option):
     WINDOW.fill(BLACK)
 
+    gui.draw_text(WINDOW, "Turn: "+str(game.get_turn()), FONT, WHITE, 50, 30)
     WINDOW.blit(BOARD_IMAGE, board_rect)
     WINDOW.blit(CAR, (car.get_x(), car.get_y()))
-    
+    WINDOW.blit(SHOE, (shoe.get_x(), shoe.get_y()))
     draw_player_info(selected_option)
     draw_widgets()
     
-    if car.get_position() in property_images:
+    if game.get_turn() == 0 and car.get_position() in property_images:
         WINDOW.blit(property_images[car.get_position()], (785, 60))
-    
+    elif game.get_turn() == 1 and shoe.get_position() in property_images:
+        WINDOW.blit(property_images[shoe.get_position()], (785, 60))
     draw_trading_area()
     
     
@@ -184,12 +219,14 @@ def draw_trading_area():
                          (200/arrowscale+arrow_offset_x, 100/arrowscale+ arrow_offset_y)))
     pygame.draw.line(WINDOW, WHITE, (950, 400), (950+115, 400), width=4)
     pygame.draw.line(WINDOW, WHITE, (760, 400), (760+115, 400), width=4)
-    
+
+special_locs = ["Go", "Community Chest", "Chance", "Tax", "Jail", "Free Parking", "Cop"]
+ 
 def main():
     clock = pygame.time.Clock()
     run = True
-    first = True
-    current_option = -1
+    
+    current_option = 0
     
     while run:
         clock.tick(FPS)
@@ -200,23 +237,27 @@ def main():
                 if event.button == 1:
                     if roll_button.is_clicked(event):
                         die.roll()
-                        car.move(die.get_rollsum()) #move the player the sum of the roll
-                        roll_button.release()    
+                        if game.get_turn() == 0:
+                            car.move(die.get_rollsum()) # Move the player the sum of the roll
+                        elif game.get_turn() == 1:
+                            shoe.move(die.get_rollsum())
+                        roll_button.release()
                     elif buy_button.is_clicked(event):
                         # Can only buy properties, not any other special location
                         loc = property_dict["locations"][car.get_position()]["name"]
-                        if loc != "GO" \
-                        and loc != "Community Chest" and loc != "Chance" \
-                        and loc != "Tax" and loc != "Jail" and loc != "Free Parking" and loc != "Cop":
-                            car.buy_property(car.get_position(), property_dict["locations"][car.get_position()]["color"], property_dict["locations"][car.get_position()]["cost"])
-                            print(car.get_properties())
-                            print(car.get_color_frequency())
+                        if loc not in special_locs:
+                            if game.get_turn() == 0:
+                                car.buy_property(car.get_position(), property_dict["locations"][car.get_position()]["color"], property_dict["locations"][car.get_position()]["cost"])
+                            elif game.get_turn() == 1:
+                                shoe.buy_property(shoe.get_position(), property_dict["locations"][shoe.get_position()]["color"], property_dict["locations"][shoe.get_position()]["cost"])
                     elif textbox.is_clicked(event):
                         textbox.set_enabled(True)
                     elif textbox2.is_clicked(event):
                         textbox2.set_enabled(True)  
+                    elif end_turn_button.is_clicked(event):
+                        game.change_turn()
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN: #When enter is pressed it exits out of typing mode for the text boxes
+                if event.key == pygame.K_RETURN: # When enter is pressed it exits out of typing mode for the text boxes
                     if textbox.is_enabled():
                         textbox.set_enabled(False)
                     elif textbox2.is_enabled():
@@ -231,7 +272,7 @@ def main():
         
         selected_option = player_option.update(events)
         # Makes sure that when an option is selected, it stay selected until a new option is picked
-        if selected_option == -1: 
+        if selected_option == -1:
             selected_option = current_option
         if selected_option != -1:
             current_option = selected_option
