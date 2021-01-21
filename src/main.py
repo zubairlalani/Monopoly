@@ -67,6 +67,8 @@ property_images = dict({
 with open('src/board_data.json') as json_file:
     property_dict = json.load(json_file) # Contains all info about each property including name, rent, cost, etc
 
+special_locs = ["Go", "Community Chest", "Chance", "Tax", "Jail", "Free Parking", "Cop"]
+
 class GameEngine:
     
     def __init__(self, amount_of_players):
@@ -89,10 +91,45 @@ class GameEngine:
         pass
     
     def check_player_pos(self):
-        if self.turn == 0 and car.get_position() == 30: # Jail
-            car.go_to_jail()
-        elif self.turn == 1 and shoe.get_position() == 30:
-            shoe.go_to_jail()
+        
+        if self.turn == 0:
+            if car.get_position() == 30: # Jail
+                car.go_to_jail()
+            elif shoe.property_owned(car.get_position()):
+                if car.get_position() == 12:
+                    if shoe.property_owned(28):
+                        rent = 10 * self.dice_roll
+                    else:
+                        rent = 4 * self.dice_roll
+                elif car.get_position() == 28:
+                    if shoe.property_owned(12):
+                        rent = 10 * self.dice_roll
+                    else:
+                        rent = 4 * self.dice_roll
+                else:
+                    rent = property_dict["locations"][car.get_position()]["rent"]
+                print("Car payed Shoe")
+                shoe.make_deposit(rent)
+                car.pay(rent)
+        elif self.turn == 1:
+            if shoe.get_position() == 30:
+                shoe.go_to_jail()
+            elif car.property_owned(shoe.get_position()):
+                if shoe.get_position() == 12:
+                    if car.property_owned(28):
+                            rent = 10 * self.dice_roll
+                    else:
+                        rent = 4 * self.dice_roll
+                elif shoe.get_position() == 28:
+                    if car.property_owned(12):
+                        rent = 10 * self.dice_roll
+                    else:
+                        rent = 4 * self.dice_roll
+                else:
+                    rent = property_dict["locations"][shoe.get_position()]["rent"]
+                print("Shoe payed car")
+                car.make_deposit(rent)
+                shoe.pay(rent)
         elif self.turn == 2:
             pass
         elif self.turn == 3:
@@ -113,7 +150,6 @@ class GameEngine:
             self.doubles += 1
             if self.doubles == 3:
                 if self.get_turn() == 0:
-                    print("Hello")
                     car.go_to_jail()
                 elif self.get_turn() == 1:
                     shoe.go_to_jail()
@@ -213,8 +249,8 @@ textbox2 = pygame_textinput.TextInput("", font_size=20, text_color=WHITE,
                                       cursor_color=ORANGE, max_string_length=18, rect=pygame.Rect(760, 370, 110, 30))
 player_option = gui.OptionBox(760, 435, 310, 30, GREY, (100, 200, 255), FONT, ["Car", "Shoe", "Ship"])
 
-car = Player("Car", 40000, START_X, START_Y)
-shoe = Player("Shoe", 40000, START_X, START_Y)
+car = Player("Car", 1500, START_X, START_Y)
+shoe = Player("Shoe", 1500, START_X, START_Y)
 die = Dice(pygame.Rect(1100+30, 50, 60, 60), pygame.Rect(1100+30, 120, 60, 60), BUTTON_COLOR, 30)
 game = GameEngine(2)
 
@@ -291,7 +327,7 @@ def draw_trading_area():
     pygame.draw.line(WINDOW, WHITE, (950, 400), (950+115, 400), width=4)
     pygame.draw.line(WINDOW, WHITE, (760, 400), (760+115, 400), width=4)
 
-special_locs = ["Go", "Community Chest", "Chance", "Tax", "Jail", "Free Parking", "Cop"]
+
  
 def main():
     clock = pygame.time.Clock()
@@ -303,6 +339,14 @@ def main():
         clock.tick(FPS)
         
         events = pygame.event.get()
+        
+        selected_option = player_option.update(events)
+        # Makes sure that when an option is selected, it stay selected until a new option is picked
+        if selected_option == -1:
+            selected_option = current_option
+        if selected_option != -1:
+            current_option = selected_option
+        
         for event in events:
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
@@ -325,6 +369,17 @@ def main():
                         textbox2.set_enabled(True)  
                     elif end_turn_button.is_clicked(event):
                         game.change_turn()
+                        
+                        if game.get_turn() == 0:
+                            current_option = 0
+                            player_option.set_selected_option(current_option)
+                        elif game.get_turn() == 1:
+                            current_option = 1
+                            player_option.set_selected_option(current_option)
+                        elif game.get_turn() == 2:
+                            current_option = 2
+                            player_option.set_selected_option(current_option)
+                            
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN: # When enter is pressed it exits out of typing mode for the text boxes
                     if textbox.is_enabled():
@@ -339,14 +394,8 @@ def main():
         elif textbox2.is_enabled():
             textbox2.update(events)
         
-        selected_option = player_option.update(events)
-        # Makes sure that when an option is selected, it stay selected until a new option is picked
-        if selected_option == -1:
-            selected_option = current_option
-        if selected_option != -1:
-            current_option = selected_option
-        
         draw(selected_option)
+        
         pygame.display.flip()
         
     pygame.quit()

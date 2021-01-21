@@ -105,7 +105,6 @@ class Player:
     def go_to_jail(self):
         self.set_position(10, 70, 680)
         self.in_jail = True
-        print("Hello2")
     
     def leave_jail(self):
         self.in_jail = False

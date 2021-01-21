@@ -81,7 +81,10 @@ class OptionBox():
                     self.selected = self.active_option
                     self.draw_menu = False
                     return self.active_option
-        return -1    
+        return -1
+    
+    def set_selected_option(self, index):
+        self.selected = index
 
 
 def draw_text(window, text, font, color, x, y):
