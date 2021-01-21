@@ -52,7 +52,7 @@ class Player:
         self.y = y
         
         self.in_jail = False
-        self.jail_count = 0
+        self.jail_turns = 0
                  
     def move(self, dice_roll):
         temp_pos = self.position
@@ -101,7 +101,26 @@ class Player:
         self.position = pos
         self.x = x
         self.y = y
-        
+    
+    def go_to_jail(self):
+        self.set_position(10, 70, 680)
+        self.in_jail = True
+        print("Hello2")
+    
+    def leave_jail(self):
+        self.in_jail = False
+        self.jail_turns = 0
+    
+    def increment_jail(self):
+        if self.in_jail:
+            self.jail_turns += 1
+    
+    def get_jail_count(self):
+        return self.jail_turns
+    
+    def is_in_jail(self):
+        return self.in_jail
+    
     def get_money(self):
         return self.money
 

@@ -98,10 +98,27 @@ class GameEngine:
             car.move(dice_roll) # Move the player the sum of the roll
         elif self.get_turn() == 1:
             shoe.move(dice_roll)
+        elif self.get_turn() == 2:
+            pass
+        elif self.get_turn() == 3:
+            pass
         
-        if double:
+        if not double:
             self.doubles += 1
-        self.rollled = True
+            if self.doubles == 3:
+                if self.get_turn() == 0:
+                    print("Hello")
+                    car.go_to_jail()
+                elif self.get_turn() == 1:
+                    shoe.go_to_jail()
+                elif self.get_turn() == 2:
+                    pass
+                elif self.get_turn() == 3:
+                    pass
+                self.doubles == 0
+                self.rollled = True
+        else:
+            self.rollled = True
     
     def roll_complete(self):
         return self.rollled
@@ -109,6 +126,24 @@ class GameEngine:
     def process_trade(self):
         pass
     
+    def is_player_in_jail(self):
+        if self.turn == 0:
+            car.increment_jail()
+            print(car.get_jail_count())
+            if car.get_jail_count() > 3:
+                car.leave_jail()
+            return car.is_in_jail()
+        elif self.turn == 1:
+            shoe.increment_jail()
+            #print(shoe.get_jail_count())
+            if shoe.get_jail_count() > 3:
+                shoe.leave_jail()
+            return shoe.is_in_jail()
+        elif self.turn == 2:
+            pass
+        elif self.turn == 3:
+            pass
+        
 class Dice:
     """Represents the die within the monopoly game and handles both drawing and rolling the die
     """
@@ -265,7 +300,7 @@ def main():
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     if roll_button.is_clicked(event):
-                        if not game.roll_complete():
+                        if not game.roll_complete() and not game.is_player_in_jail():
                             die.roll()
                             game.set_dice_roll(die.get_rollsum(), die.is_double())
                         roll_button.release()
