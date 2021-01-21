@@ -50,6 +50,9 @@ class Player:
         self.position = 0
         self.x = x
         self.y = y
+        
+        self.in_jail = False
+        self.jail_count = 0
                  
     def move(self, dice_roll):
         temp_pos = self.position

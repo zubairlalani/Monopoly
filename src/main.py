@@ -75,10 +75,12 @@ class GameEngine:
         self.rollled = False # Determines which phase of a players turn (rolling, trading, etc)
         self.doubles = 0 # Determines amount doubles rolled
         self.dice_roll = 0 # Dice roll for a single turn
-    
+        
     def change_turn(self):
         self.turn += 1
         self.turn = self.turn % self.amount_of_players
+        self.rollled = False
+        self.doubles = 0
         
     def get_turn(self):
         return self.turn
@@ -89,9 +91,20 @@ class GameEngine:
     def check_player_pos(self):
         pass
     
-    def set_dice_roll(self, dice_roll):
+    def set_dice_roll(self, dice_roll, double):
         self.dice_roll = dice_roll
-         
+        if self.get_turn() == 0:
+            car.move(dice_roll) # Move the player the sum of the roll
+        elif self.get_turn() == 1:
+            shoe.move(dice_roll)
+        
+        if double:
+            self.doubles += 1
+        self.rollled = True
+    
+    def roll_complete(self):
+        return self.rollled
+    
 class Dice:
     """Represents the die within the monopoly game and handles both drawing and rolling the die
     """
@@ -126,6 +139,11 @@ class Dice:
         self.dice_two = str(random.randint(1, 6))
         self.surface = FONT.render(self.dice_one, True, ORANGE)
         self.surface2 = FONT.render(self.dice_two, True, ORANGE)
+    
+    def is_double(self):
+        if self.dice_one == self.dice_two:
+            return True
+        return False
     
     def draw_dice(self):
         pygame.draw.rect(WINDOW, self.color, self.dice_rect, 2)
@@ -236,20 +254,18 @@ def main():
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     if roll_button.is_clicked(event):
-                        die.roll()
-                        if game.get_turn() == 0:
-                            car.move(die.get_rollsum()) # Move the player the sum of the roll
-                        elif game.get_turn() == 1:
-                            shoe.move(die.get_rollsum())
+                        if not game.roll_complete():
+                            die.roll()
+                            game.set_dice_roll(die.get_rollsum(), die.is_double())
                         roll_button.release()
                     elif buy_button.is_clicked(event):
                         # Can only buy properties, not any other special location
                         loc = property_dict["locations"][car.get_position()]["name"]
-                        if loc not in special_locs:
-                            if game.get_turn() == 0:
-                                car.buy_property(car.get_position(), property_dict["locations"][car.get_position()]["color"], property_dict["locations"][car.get_position()]["cost"])
-                            elif game.get_turn() == 1:
-                                shoe.buy_property(shoe.get_position(), property_dict["locations"][shoe.get_position()]["color"], property_dict["locations"][shoe.get_position()]["cost"])
+                        loc2 = property_dict["locations"][shoe.get_position()]["name"]
+                        if game.get_turn() == 0 and loc not in special_locs:
+                            car.buy_property(car.get_position(), property_dict["locations"][car.get_position()]["color"], property_dict["locations"][car.get_position()]["cost"])
+                        elif game.get_turn() == 1 and loc2 not in special_locs:
+                            shoe.buy_property(shoe.get_position(), property_dict["locations"][shoe.get_position()]["color"], property_dict["locations"][shoe.get_position()]["cost"])
                     elif textbox.is_clicked(event):
                         textbox.set_enabled(True)
                     elif textbox2.is_clicked(event):
