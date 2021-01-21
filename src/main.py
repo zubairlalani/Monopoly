@@ -89,7 +89,8 @@ class GameEngine:
         pass
     
     def check_player_pos(self):
-        pass
+        if car.get_position() == 30: # Jail
+            car.set_position(10, 100, 700)
     
     def set_dice_roll(self, dice_roll, double):
         self.dice_roll = dice_roll
@@ -104,6 +105,9 @@ class GameEngine:
     
     def roll_complete(self):
         return self.rollled
+    
+    def process_trade(self):
+        pass
     
 class Dice:
     """Represents the die within the monopoly game and handles both drawing and rolling the die
@@ -169,7 +173,6 @@ player_option = gui.OptionBox(760, 435, 310, 30, GREY, (100, 200, 255), FONT, ["
 
 car = Player("Car", 40000, START_X, START_Y)
 shoe = Player("Shoe", 40000, START_X, START_Y)
-
 die = Dice(pygame.Rect(1100+30, 50, 60, 60), pygame.Rect(1100+30, 120, 60, 60), BUTTON_COLOR, 30)
 game = GameEngine(2)
 
@@ -190,7 +193,15 @@ def draw_player_info(selected_option):
 def draw(selected_option):
     WINDOW.fill(BLACK)
 
-    gui.draw_text(WINDOW, "Turn: "+str(game.get_turn()), FONT, WHITE, 50, 30)
+    if game.get_turn() == 0:
+        gui.draw_text(WINDOW, "Turn: Car", FONT, WHITE, 50, 30)
+    elif game.get_turn() == 1:
+        gui.draw_text(WINDOW, "Turn: Shoe", FONT, WHITE, 50, 30)
+    elif game.get_turn() == 2:
+        gui.draw_text(WINDOW, "Turn: Ship", FONT, WHITE, 50, 30)
+    elif game.get_turn() == 3:
+        gui.draw_text(WINDOW, "Turn: Hat", FONT, WHITE, 50, 30)
+        
     WINDOW.blit(BOARD_IMAGE, board_rect)
     WINDOW.blit(CAR, (car.get_x(), car.get_y()))
     WINDOW.blit(SHOE, (shoe.get_x(), shoe.get_y()))

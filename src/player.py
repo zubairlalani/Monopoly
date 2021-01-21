@@ -97,6 +97,11 @@ class Player:
     def get_position(self):
         return self.position
 
+    def set_position(self, pos, x, y):
+        self.position = pos
+        self.x = x
+        self.y = y
+        
     def get_money(self):
         return self.money
 
