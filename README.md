@@ -11,6 +11,6 @@ This project is a multiplayer monopoly replica. The goal of this project is to l
 
 ### Progress
 
-Thus far, I've implemented all of the UI and good portion of the functionality. The player can now move around the board based on the dice roll, and buy properties. In addition, gui components such text input and drop down menus have been created. Properties appear on the right as a player lands on them.
+Thus far, I've implemented all of the UI and good portion of the functionality. The player can now move around the board based on the dice roll, and buy properties. In addition, gui components such text input and drop down menus have been created. Properties appear on the right as a player lands on them. When a player buys a property, the corresponding colored box gets filled in, and the players wealth decreases. In addition, turns can now be taken in moving and buying properties.
 
 ![alt text](midway_progress.png "See the picture for my progress so far!")
