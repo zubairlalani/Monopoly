@@ -89,8 +89,14 @@ class GameEngine:
         pass
     
     def check_player_pos(self):
-        if car.get_position() == 30: # Jail
-            car.set_position(10, 100, 700)
+        if self.turn == 0 and car.get_position() == 30: # Jail
+            car.go_to_jail()
+        elif self.turn == 1 and shoe.get_position() == 30:
+            shoe.go_to_jail()
+        elif self.turn == 2:
+            pass
+        elif self.turn == 3:
+            pass
     
     def set_dice_roll(self, dice_roll, double):
         self.dice_roll = dice_roll
@@ -103,7 +109,7 @@ class GameEngine:
         elif self.get_turn() == 3:
             pass
         
-        if not double:
+        if double:
             self.doubles += 1
             if self.doubles == 3:
                 if self.get_turn() == 0:
@@ -119,7 +125,8 @@ class GameEngine:
                 self.rollled = True
         else:
             self.rollled = True
-    
+        
+        self.check_player_pos()
     def roll_complete(self):
         return self.rollled
     
