@@ -79,7 +79,7 @@
         },
         {
             "id" : "8",
-            "friend_id" : 7,
+            "friend_id" : 6,
             "friend_id2" : 9,
             "name" : "Vermont Avenue",
             "color" : "Light Blue",
@@ -96,7 +96,7 @@
         },
         {
             "id" : "9",
-            "friend_id" : 7,
+            "friend_id" : 6,
             "friend_id2" : 8,
             "name" : "Connecticut Avenue",
             "color" : "Light Blue",

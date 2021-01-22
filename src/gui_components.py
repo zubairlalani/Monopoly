@@ -86,8 +86,12 @@ class OptionBox():
     def set_selected_option(self, index):
         self.selected = index
         
-def draw_text(window, text, font, color, x, y):
+def draw_text(window, text, font, color, x, y, centered):
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect()
-    text_rect.topleft = (x, y)
+    if centered:
+        text_rect.center = (x, y)
+    else:
+        text_rect.topleft = (x, y)
     window.blit(text_surface, text_rect)
+    

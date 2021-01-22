@@ -109,19 +109,33 @@ class GameEngine:
                 else:
                     rent = property_dict["locations"][car.get_position()]["rent"]
                     if shoe.has_color_group(property_dict["locations"][car.get_position()]["color"]):
-                        rent = 2 * rent
+                        number_of_houses = shoe.get_property_house_amount(car.get_position())
+                        # Determine rent based on number of nhouses
+                        if number_of_houses == 0:
+                            rent = 2 * rent # When a player owns a color group the regular rent is doubled
+                        elif number_of_houses == 1:
+                            rent = property_dict["locations"][car.get_position()]["rent1"]
+                        elif number_of_houses == 2:
+                            rent = property_dict["locations"][car.get_position()]["rent2"]
+                        elif number_of_houses == 3:
+                            rent = property_dict["locations"][car.get_position()]["rent3"]
+                        elif number_of_houses == 4:
+                            rent = property_dict["locations"][car.get_position()]["rent4"]
+                        elif number_of_houses == 5:
+                            rent = property_dict["locations"][car.get_position()]["rent5"]
                 print("Car payed Shoe")
                 shoe.make_deposit(rent)
                 car.pay(rent)
+        
         elif self.turn == 1:
             if shoe.get_position() == 30:
                 shoe.go_to_jail()
-            elif car.property_owned(shoe.get_position()):
-                if shoe.get_position() == 12:
-                    if car.property_owned(28):
-                            rent = 10 * self.dice_roll
+            elif car.property_owned(shoe.get_position()): # When Car owns property that shoe lands on, then shoe must pay the car
+                if shoe.get_position() == 12: # Electric community --> 12
+                    if car.property_owned(28): # Water works --> 28
+                            rent = 10 * self.dice_roll # Rent is 10 times the dice roll when both water works and electric community is owned
                     else:
-                        rent = 4 * self.dice_roll
+                        rent = 4 * self.dice_roll # Rent is 4 times the dice roll when both water works and electric community is owned
                 elif shoe.get_position() == 28:
                     if car.property_owned(12):
                         rent = 10 * self.dice_roll
@@ -129,8 +143,22 @@ class GameEngine:
                         rent = 4 * self.dice_roll
                 else:
                     rent = property_dict["locations"][shoe.get_position()]["rent"]
-                    if car.has_color_group(property_dict["locations"][shoe.get_position()]["color"]):
-                        rent = 2 * rent
+                    
+                    if car.has_color_group(property_dict["locations"][shoe.get_position()]["color"]): # player must have a color group to start building houses
+                        number_of_houses = car.get_property_house_amount(shoe.get_position())
+                        # Determine rent based on number of nhouses
+                        if number_of_houses == 0:
+                            rent = 2 * rent # When a player owns a color group the regular rent is doubled
+                        elif number_of_houses == 1:
+                            rent = property_dict["locations"][shoe.get_position()]["rent1"]
+                        elif number_of_houses == 2:
+                            rent = property_dict["locations"][shoe.get_position()]["rent2"]
+                        elif number_of_houses == 3:
+                            rent = property_dict["locations"][shoe.get_position()]["rent3"]
+                        elif number_of_houses == 4:
+                            rent = property_dict["locations"][shoe.get_position()]["rent4"]
+                        elif number_of_houses == 5:
+                            rent = property_dict["locations"][shoe.get_position()]["rent5"]
                 print("Shoe payed car")
                 car.make_deposit(rent)
                 shoe.pay(rent)
@@ -251,8 +279,8 @@ textbox2 = pygame_textinput.TextInput("", font_size=20, text_color=WHITE,
                                       cursor_color=ORANGE, max_string_length=18, rect=pygame.Rect(760, 370, 110, 30))
 player_option = gui.OptionBox(760, 435, 310, 30, GREY, (100, 200, 255), FONT, ["Car", "Shoe", "Ship"])
 
-car = Player("Car", 1500, START_X, START_Y)
-shoe = Player("Shoe", 1500, START_X, START_Y)
+car = Player("Car", 40000, START_X, START_Y)
+shoe = Player("Shoe", 40000, START_X, START_Y)
 die = Dice(pygame.Rect(1100+30, 50, 60, 60), pygame.Rect(1100+30, 120, 60, 60), BUTTON_COLOR, 30)
 game = GameEngine(2)
 
@@ -260,13 +288,13 @@ def draw_player_info(selected_option):
     info_rect = pygame.Rect(760, 435, 310, 300)
     pygame.draw.rect(WINDOW, WHITE, info_rect, 2)
     if selected_option == 0:
-        gui.draw_text(WINDOW, "Wealth: $"+str(car.get_money()), FONT, WHITE, info_rect.left, 475)
-        gui.draw_text(WINDOW, "Properties: ", FONT, WHITE, info_rect.left, 510)
-        car.draw_player_properties(WINDOW)
+        gui.draw_text(WINDOW, "Wealth: $"+str(car.get_money()), FONT, WHITE, info_rect.left, 475, False)
+        gui.draw_text(WINDOW, "Properties: ", FONT, WHITE, info_rect.left, 510, False)
+        car.draw_player_properties(WINDOW, FONT)
     elif selected_option == 1:
-        gui.draw_text(WINDOW, "Wealth: $"+str(shoe.get_money()), FONT, WHITE, info_rect.left, 475)
-        gui.draw_text(WINDOW, "Properties: ", FONT, WHITE, info_rect.left, 510)
-        shoe.draw_player_properties(WINDOW)
+        gui.draw_text(WINDOW, "Wealth: $"+str(shoe.get_money()), FONT, WHITE, info_rect.left, 475, False)
+        gui.draw_text(WINDOW, "Properties: ", FONT, WHITE, info_rect.left, 510, False)
+        shoe.draw_player_properties(WINDOW, FONT)
     elif selected_option == 2:
         pass
    
@@ -274,13 +302,13 @@ def draw(selected_option):
     WINDOW.fill(BLACK)
 
     if game.get_turn() == 0:
-        gui.draw_text(WINDOW, "Turn: Car", FONT, WHITE, 50, 30)
+        gui.draw_text(WINDOW, "Turn: Car", FONT, WHITE, 50, 30, False)
     elif game.get_turn() == 1:
-        gui.draw_text(WINDOW, "Turn: Shoe", FONT, WHITE, 50, 30)
+        gui.draw_text(WINDOW, "Turn: Shoe", FONT, WHITE, 50, 30, False)
     elif game.get_turn() == 2:
-        gui.draw_text(WINDOW, "Turn: Ship", FONT, WHITE, 50, 30)
+        gui.draw_text(WINDOW, "Turn: Ship", FONT, WHITE, 50, 30, False)
     elif game.get_turn() == 3:
-        gui.draw_text(WINDOW, "Turn: Hat", FONT, WHITE, 50, 30)
+        gui.draw_text(WINDOW, "Turn: Hat", FONT, WHITE, 50, 30, False)
         
     WINDOW.blit(BOARD_IMAGE, board_rect)
     WINDOW.blit(CAR, (car.get_x(), car.get_y()))
@@ -382,6 +410,7 @@ def main():
                                 if "house_price" in property_dict["locations"][pos]:
                                     color = property_dict["locations"][pos]["color"]
                                     if game.get_turn() == 0:
+                                        print(color)
                                         if car.has_color_group(color):
                                             color_property = property_dict["locations"][pos]["friend_id"]
                                             
@@ -392,6 +421,7 @@ def main():
                                                 car.buy_house(pos, color, property_dict["locations"][pos]["house_price"], color_property)
                                                 
                                     elif game.get_turn() == 1:
+                                        print(color)
                                         if shoe.has_color_group(color):
                                             if "friend_id2" in property_dict["locations"][pos]:
                                                 shoe.buy_house(pos, color, property_dict["locations"][pos]["house_price"], 
