@@ -61,6 +61,9 @@ class Player:
         temp_pos = self.position
         self.position += dice_roll
         self.position = self.position % 40
+        if temp_pos > self.position:
+            self.make_deposit(200) # passed GO so player earns $200 salary
+            
         while temp_pos != self.position:
             if temp_pos < 10:
                 self.x += 56 * -1

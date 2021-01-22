@@ -95,6 +95,18 @@ class GameEngine:
         if self.turn == 0:
             if car.get_position() == 30: # Jail
                 car.go_to_jail()
+            
+            elif car.get_position() == 4: # Tax $200
+                print("TAX 200!")
+                car.pay(200)
+            elif car.get_position() == 38: # Tax $100
+                print("TAX 100!")
+                car.pay(100)
+            elif car.get_position() == 2 or car.get_position() == 17 or car.get_position() == 33: # Community Chest spots
+                pass
+            elif car.get_position() == 7 or car.get_position() == 22 or car.get_position() == 36: # Chance spots
+                pass
+        
             elif shoe.property_owned(car.get_position()):
                 if car.get_position() == 12: # electric community
                     if shoe.property_owned(28):
@@ -130,6 +142,16 @@ class GameEngine:
         elif self.turn == 1:
             if shoe.get_position() == 30:
                 shoe.go_to_jail()
+            elif shoe.get_position() == 4: # Tax $200
+                print("TAX 200!")
+                shoe.pay(200)
+            elif shoe.get_position() == 38: # Tax $100
+                print("TAX 100!")
+                shoe.pay(100)
+            elif shoe.get_position() == 2 or shoe.get_position() == 17 or shoe.get_position() == 33: # Community Chest spots
+                pass
+            elif shoe.get_position() == 7 or shoe.get_position() == 22 or shoe.get_position() == 36: # Chance spots
+                pass
             elif car.property_owned(shoe.get_position()): # When Car owns property that shoe lands on, then shoe must pay the car
                 if shoe.get_position() == 12: # Electric community --> 12
                     if car.property_owned(28): # Water works --> 28
@@ -273,6 +295,8 @@ build_button = gui.Button(WINDOW, "Build", FONT, ORANGE, pygame.Rect(1110, 440, 
 mortgage_button = gui.Button(WINDOW, "Mortgage", FONT, ORANGE, pygame.Rect(1110, 520, 100, 60), BUTTON_COLOR)
 analysis_button = gui.Button(WINDOW, "Analysis", FONT, ORANGE, pygame.Rect(1110, 600, 100, 60), BUTTON_COLOR)
 end_turn_button = gui.Button(WINDOW, "End Turn", FONT, ORANGE, pygame.Rect(1110, 680, 100, 60), BUTTON_COLOR)
+bail_button = gui.Button(WINDOW, "Pay Bail", FONT, (0, 0, 255), pygame.Rect(1110-250, 200, 100, 60), (255, 0, 0))
+
 textbox = pygame_textinput.TextInput("", font_size=20, text_color=WHITE,
                                      cursor_color=ORANGE, max_string_length=18, rect=pygame.Rect(950, 370, 110, 30))
 textbox2 = pygame_textinput.TextInput("", font_size=20, text_color=WHITE,
@@ -332,6 +356,9 @@ def draw_widgets():
     mortgage_button.draw()
     analysis_button.draw()
     end_turn_button.draw()
+    if (game.get_turn() == 0 and car.is_in_jail()) or (game.get_turn() == 1 and shoe.is_in_jail()):
+        bail_button.draw()
+        
     WINDOW.blit(textbox.get_surface(), (950, 400 - textbox.get_fontsize()))
     WINDOW.blit(textbox2.get_surface(), (760, 400 - textbox2.get_fontsize()))
     player_option.draw(WINDOW)
@@ -455,6 +482,17 @@ def main():
                         elif game.get_turn() == 2:
                             current_option = 2
                             player_option.set_selected_option(current_option)
+                    elif bail_button.is_clicked(event):
+                        if game.get_turn() == 0 and car.is_in_jail():
+                            car.pay(50)
+                            car.leave_jail()
+                        elif game.get_turn() == 1 and shoe.is_in_jail():
+                            shoe.pay(50)
+                            shoe.leave_jail()
+                        elif game.get_turn() == 2:
+                            pass
+                        elif game.get_turn() == 3:
+                            pass
                             
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN: # When enter is pressed it exits out of typing mode for the text boxes
