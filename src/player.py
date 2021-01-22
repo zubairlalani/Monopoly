@@ -46,6 +46,7 @@ class Player:
         self.money = money
         self.properties = set()
         self.color_frequency = {}
+        self.houses = {}
         
         self.position = 0
         self.x = x
@@ -85,6 +86,23 @@ class Player:
             
             self.money -= price
     
+    def buy_house(self, property_id, property_color, price, color_property, color_property2=None):
+        if self.money - price >= 0: # Make sure that player has the funds to buy the house
+            
+            if property_id in self.houses:
+                if color_property2 != None:
+                    if (self.get_property_house_amount(property_id) - self.get_property_house_amount(color_property)) < 1 \
+                    and (self.get_property_house_amount(property_id) - self.get_property_house_amount(color_property2)) < 1:
+                        self.houses[property_id] += 1 # Maps properties to the amount of houses they have
+                        self.money -= price
+                elif (self.get_property_house_amount(property_id) - self.get_property_house_amount(color_property)) < 1:
+                        self.houses[property_id] += 1
+                        self.money -= price
+            else:
+                self.houses[property_id] = 1
+                self.money -= price
+            
+              
     def property_owned(self, property_id):
         return property_id in self.properties
     
@@ -93,7 +111,19 @@ class Player:
     
     def pay(self, amount):
         self.money -= amount
-        
+    
+    def has_color_group(self, color):
+        if (color == "Brown" or color == "Dark Blue") and self.color_frequency[color] == 2:
+            return True
+        elif self.color_frequency[color] == 3:
+            return True
+        return False
+    
+    def get_property_house_amount(self, property_id):
+        if property_id not in self.houses:
+            return 0
+        return self.houses[property_id]
+    
     def get_position(self):
         return self.position
 
@@ -125,7 +155,9 @@ class Player:
 
     def get_properties(self):
         return self.properties
-
+    
+    def get_houses(self):
+        return self.houses
     def get_color_frequency(self):
         return self.color_frequency
     

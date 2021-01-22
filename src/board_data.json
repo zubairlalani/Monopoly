@@ -7,9 +7,10 @@
         {
             "name" : "Mediterranean Avenue",
             "id" : "1",
-            "color" : "brown",
+            "friend_id" : 3,
+            "color" : "Brown",
             "cost" : 60,
-            "rent" : "2",
+            "rent" : 2,
             "rent1" : 10,
             "rent2" : 30,
             "rent3" : 90,
@@ -26,7 +27,8 @@
         {
             "id" : 3,
             "name" : "Baltic Avenue",
-            "color" : "brown",
+            "friend_id" : 1,
+            "color" : "Brown",
             "cost" : 60,
             "rent" : 4,
             "rent1" : 20,
@@ -56,6 +58,8 @@
         },
         {
             "id" : "6",
+            "friend_id" : 8,
+            "friend_id2" : 9,
             "name" : "Oriental Avenue",
             "color" : "Light Blue",
             "cost" : 100,
@@ -75,6 +79,8 @@
         },
         {
             "id" : "8",
+            "friend_id" : 7,
+            "friend_id2" : 9,
             "name" : "Vermont Avenue",
             "color" : "Light Blue",
             "cost" : 100,
@@ -90,6 +96,8 @@
         },
         {
             "id" : "9",
+            "friend_id" : 7,
+            "friend_id2" : 8,
             "name" : "Connecticut Avenue",
             "color" : "Light Blue",
             "cost" : 120,
@@ -109,6 +117,8 @@
         },
         {
             "id" : "11",
+            "friend_id" : 13,
+            "friend_id2" : 14,
             "name" : "St. Charles Place",
             "color" : "Pink",
             "cost" : 140,
@@ -131,6 +141,8 @@
         },
         {
             "id" : "13",
+            "friend_id" : 11,
+            "friend_id2" : 14,
             "name" : "States Avenue",
             "color" : "Pink",
             "cost" : 140,
@@ -146,6 +158,8 @@
         },
         {
             "id" : "14",
+            "friend_id" : 11,
+            "friend_id2" : 13,
             "name" : "Virginia Avenue",
             "color" : "Pink",
             "cost" : 160,
@@ -172,6 +186,8 @@
         },
         {
             "id" : "16",
+            "friend_id" : 18,
+            "friend_id2" : 19,
             "name" : "St. James Place",
             "color" : "Orange",
             "cost" : 180,
@@ -191,6 +207,8 @@
         },
         {
             "id" : "18",
+            "friend_id" : 16,
+            "friend_id2" : 19,
             "name" : "Tennessee Avenue",
             "color" : "Orange",
             "cost" : 180,
@@ -206,6 +224,8 @@
         },
         {
             "id" : "19",
+            "friend_id" : 16,
+            "friend_id2" : 19,
             "name" : "New York Avenue",
             "color" : "Orange",
             "cost" : 200,
@@ -225,6 +245,8 @@
         },
         {
             "id" : "21",
+            "friend_id" : 23,
+            "friend_id2" : 24,
             "name" : "Kentucky Avenue",
             "color" : "Red",
             "cost" : 220,
@@ -244,6 +266,8 @@
         },
         {
             "id" : "23",
+            "friend_id" : 21,
+            "friend_id2" : 24,
             "name" : "Indiana Avenue",
             "color" : "Red",
             "cost" : 220,
@@ -259,6 +283,8 @@
         },
         {
             "id" : "24",
+            "friend_id" : 21,
+            "friend_id2" : 23,
             "name" : "Illinois Avenue",
             "color" : "Red",
             "cost" : 240,
@@ -285,6 +311,8 @@
         },
         {
             "id" : "26",
+            "friend_id" : 27,
+            "friend_id2" : 29,
             "name" : "Atlantic Avenue",
             "color" : "Yellow",
             "cost" : 260,
@@ -300,6 +328,8 @@
         },
         {
             "id" : "27",
+            "friend_id" : 26,
+            "friend_id2" : 29,
             "name" : "Ventnor Avenue",
             "color" : "Yellow",
             "cost" : 260,
@@ -322,6 +352,8 @@
         },
         {
             "id" : "29",
+            "friend_id" : 26,
+            "friend_id2" : 27,
             "name" : "Marvin Gardens",
             "color" : "Yellow",
             "cost" : 280,
@@ -341,6 +373,8 @@
         },
         {
             "id" : "31",
+            "friend_id" : 32,
+            "friend_id2" : 34,
             "name" : "Pacific Avenue",
             "color" : "Green",
             "cost" : 300,
@@ -356,6 +390,8 @@
         },
         {
             "id" : "32",
+            "friend_id" : 31,
+            "friend_id2" : 34,
             "name" : "North Carolina Avenue",
             "color" : "Green",
             "cost" : 300,
@@ -375,6 +411,8 @@
         },
         {
             "id" : "34",
+            "friend_id" : 31,
+            "friend_id2" : 32,
             "name" : "Pennsylvania Avenue",
             "color" : "Green",
             "cost" : 320,
@@ -405,6 +443,7 @@
         },
         {
             "id" : "37",
+            "friend_id" : 39,
             "name" : "Park Place",
             "color" : "Dark Blue",
             "cost" : 350,
@@ -425,6 +464,7 @@
         },
         {
             "id" : "39",
+            "friend_id" : 37,
             "name" : "Boardwalk",
             "color" : "Dark Blue",
             "cost" : 400,

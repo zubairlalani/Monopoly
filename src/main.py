@@ -96,7 +96,7 @@ class GameEngine:
             if car.get_position() == 30: # Jail
                 car.go_to_jail()
             elif shoe.property_owned(car.get_position()):
-                if car.get_position() == 12:
+                if car.get_position() == 12: # electric community
                     if shoe.property_owned(28):
                         rent = 10 * self.dice_roll
                     else:
@@ -108,6 +108,8 @@ class GameEngine:
                         rent = 4 * self.dice_roll
                 else:
                     rent = property_dict["locations"][car.get_position()]["rent"]
+                    if shoe.has_color_group(property_dict["locations"][car.get_position()]["color"]):
+                        rent = 2 * rent
                 print("Car payed Shoe")
                 shoe.make_deposit(rent)
                 car.pay(rent)
@@ -127,6 +129,8 @@ class GameEngine:
                         rent = 4 * self.dice_roll
                 else:
                     rent = property_dict["locations"][shoe.get_position()]["rent"]
+                    if car.has_color_group(property_dict["locations"][shoe.get_position()]["color"]):
+                        rent = 2 * rent
                 print("Shoe payed car")
                 car.make_deposit(rent)
                 shoe.pay(rent)
@@ -172,13 +176,11 @@ class GameEngine:
     def is_player_in_jail(self):
         if self.turn == 0:
             car.increment_jail()
-            print(car.get_jail_count())
             if car.get_jail_count() > 3:
                 car.leave_jail()
             return car.is_in_jail()
         elif self.turn == 1:
             shoe.increment_jail()
-            #print(shoe.get_jail_count())
             if shoe.get_jail_count() > 3:
                 shoe.leave_jail()
             return shoe.is_in_jail()
@@ -328,7 +330,14 @@ def draw_trading_area():
     pygame.draw.line(WINDOW, WHITE, (760, 400), (760+115, 400), width=4)
 
 
- 
+
+def RepresentsInt(s):
+    try: 
+        int(s)
+        return True
+    except ValueError:
+        return False
+    
 def main():
     clock = pygame.time.Clock()
     run = True
@@ -339,6 +348,7 @@ def main():
         clock.tick(FPS)
         
         events = pygame.event.get()
+        
         
         selected_option = player_option.update(events)
         # Makes sure that when an option is selected, it stay selected until a new option is picked
@@ -355,6 +365,7 @@ def main():
                             die.roll()
                             game.set_dice_roll(die.get_rollsum(), die.is_double())
                         roll_button.release()
+                    
                     elif buy_button.is_clicked(event):
                         # Can only buy properties, not any other special location
                         loc = property_dict["locations"][car.get_position()]["name"]
@@ -363,6 +374,41 @@ def main():
                             car.buy_property(car.get_position(), property_dict["locations"][car.get_position()]["color"], property_dict["locations"][car.get_position()]["cost"])
                         elif game.get_turn() == 1 and loc2 not in special_locs:
                             shoe.buy_property(shoe.get_position(), property_dict["locations"][shoe.get_position()]["color"], property_dict["locations"][shoe.get_position()]["cost"])
+                    
+                    elif build_button.is_clicked(event):
+                        if RepresentsInt(textbox.get_text()):
+                            pos = int(textbox.get_text())
+                            if len(property_dict["locations"]) >= pos:
+                                if "house_price" in property_dict["locations"][pos]:
+                                    color = property_dict["locations"][pos]["color"]
+                                    if game.get_turn() == 0:
+                                        if car.has_color_group(color):
+                                            color_property = property_dict["locations"][pos]["friend_id"]
+                                            
+                                            if "friend_id2" in property_dict["locations"][pos]:
+                                                color_property2 = property_dict["locations"][pos]["friend_id2"]
+                                                car.buy_house(pos, color, property_dict["locations"][pos]["house_price"], color_property, color_property2)
+                                            else:
+                                                car.buy_house(pos, color, property_dict["locations"][pos]["house_price"], color_property)
+                                                
+                                    elif game.get_turn() == 1:
+                                        if shoe.has_color_group(color):
+                                            if "friend_id2" in property_dict["locations"][pos]:
+                                                shoe.buy_house(pos, color, property_dict["locations"][pos]["house_price"], 
+                                                            property_dict["locations"][pos]["friend_id"], property_dict["locations"][pos]["friend_id2"])
+                                            else:
+                                                shoe.buy_house(pos, color, property_dict["locations"][pos]["house_price"], 
+                                                            property_dict["locations"][pos]["friend_id"])
+                                    elif game.get_turn() == 2:
+                                        pass
+                                    elif game.get_turn() == 4:
+                                        pass
+                            
+                    elif analysis_button.is_clicked(event):
+                        print("CAR: ")
+                        print(car.get_houses())
+                        print("SHOE: ")
+                        print(shoe.get_houses())
                     elif textbox.is_clicked(event):
                         textbox.set_enabled(True)
                     elif textbox2.is_clicked(event):
@@ -395,8 +441,9 @@ def main():
             textbox2.update(events)
         
         draw(selected_option)
-        
+            
         pygame.display.flip()
+        
         
     pygame.quit()
 
