@@ -12,14 +12,10 @@ class Button:
         self.surface = font.render(self.text, True, textcolor)
         self.text_rect = self.surface.get_rect()
         self.text_rect.center = self.rect.center
-        self.clicked = False
         
     def draw(self):
         pygame.draw.rect(self.window, self.color, self.rect, border_radius=10)
         self.window.blit(self.surface, self.text_rect)
-    
-    def release(self):
-        self.clicked = False
     
     def is_clicked(self, event):
         if self.rect.collidepoint(event.pos):

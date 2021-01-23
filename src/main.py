@@ -70,17 +70,23 @@ with open('src/board_data.json') as json_file:
 special_locs = ["Go", "Community Chest", "Chance", "Tax", "Jail", "Free Parking", "Cop"]
 
 class GameEngine:
-    
+    """Handles game logic such as jail, taxes, rolling doubles, turns, rent, etc
+    """
     def __init__(self, amount_of_players):
+        """Initilaize essential logic to the game such as players, starting turn, whether someone has rolled
+        
+        Args:
+            amount_of_players (int): Amount of players that will participate in the game
+        """
         self.amount_of_players = amount_of_players
-        self.turn = 0
+        self.turn = 0 # Starts on first players turn
         self.rollled = False # Determines which phase of a players turn (rolling, trading, etc)
         self.doubles = 0 # Determines amount doubles rolled
         self.dice_roll = 0 # Dice roll for a single turn
-        
+    
     def change_turn(self):
         self.turn += 1
-        self.turn = self.turn % self.amount_of_players
+        self.turn = self.turn % self.amount_of_players # Make sure that the turn loops based on amount of players
         self.rollled = False
         self.doubles = 0
         
@@ -106,9 +112,11 @@ class GameEngine:
                 
                 for other_player in players:
                     if other_player is not player and other_player.property_owned(player.get_position()):
+                        # WHen both electric community and water works is owned, 
+                        # the rent is 10 times the dice roll, otherwise it is 4 times the roll
                         if player.get_position() == 12: # electric community
-                            if other_player.property_owned(28):
-                                rent = 10 * self.dice_roll
+                            if other_player.property_owned(28): # Water works
+                                rent = 10 * self.dice_roll 
                             else:
                                 rent = 4 * self.dice_roll
                         elif player.get_position() == 28:
@@ -168,20 +176,12 @@ class GameEngine:
         pass
     
     def is_player_in_jail(self):
-        if self.turn == 0:
-            car.increment_jail()
-            if car.get_jail_count() > 3:
-                car.leave_jail()
-            return car.is_in_jail()
-        elif self.turn == 1:
-            shoe.increment_jail()
-            if shoe.get_jail_count() > 3:
-                shoe.leave_jail()
-            return shoe.is_in_jail()
-        elif self.turn == 2:
-            pass
-        elif self.turn == 3:
-            pass
+        for player in players:
+            if player.is_player_turn(game.turn):
+                player.increment_jail()
+                if player.get_jail_count() > 3:
+                    player.leave_jail()
+                return player.is_in_jail()
         
 class Dice:
     """Represents the die within the monopoly game and handles both drawing and rolling the die
@@ -246,12 +246,10 @@ textbox = pygame_textinput.TextInput("", font_size=20, text_color=WHITE,
                                      cursor_color=ORANGE, max_string_length=18, rect=pygame.Rect(950, 370, 110, 30))
 textbox2 = pygame_textinput.TextInput("", font_size=20, text_color=WHITE,
                                       cursor_color=ORANGE, max_string_length=18, rect=pygame.Rect(760, 370, 110, 30))
-player_option = gui.OptionBox(760, 435, 310, 30, GREY, (100, 200, 255), FONT, ["Car", "Shoe", "Ship"])
+player_option = gui.OptionBox(760, 435, 310, 30, GREY, (100, 200, 255), FONT, ["Car", "Shoe", "Ship", "Hat"])
 
 car = Player("Car", 40000, START_X, START_Y, 0)
 shoe = Player("Shoe", 40000, START_X, START_Y, 1)
-
-
 players = [car, shoe]
 
 die = Dice(pygame.Rect(1100+30, 50, 60, 60), pygame.Rect(1100+30, 120, 60, 60), BUTTON_COLOR, 30)
@@ -260,28 +258,18 @@ game = GameEngine(2)
 def draw_player_info(selected_option):
     info_rect = pygame.Rect(760, 435, 310, 300)
     pygame.draw.rect(WINDOW, WHITE, info_rect, 2)
-    if selected_option == 0:
-        gui.draw_text(WINDOW, "Wealth: $"+str(car.get_money()), FONT, WHITE, info_rect.left, 475, False)
-        gui.draw_text(WINDOW, "Properties: ", FONT, WHITE, info_rect.left, 510, False)
-        car.draw_player_properties(WINDOW)
-    elif selected_option == 1:
-        gui.draw_text(WINDOW, "Wealth: $"+str(shoe.get_money()), FONT, WHITE, info_rect.left, 475, False)
-        gui.draw_text(WINDOW, "Properties: ", FONT, WHITE, info_rect.left, 510, False)
-        shoe.draw_player_properties(WINDOW)
-    elif selected_option == 2:
-        pass
+    for player in players:
+        if selected_option == player.get_turn_number():
+            gui.draw_text(WINDOW, "Wealth: $"+str(player.get_money()), FONT, WHITE, info_rect.left, 475, False)
+            gui.draw_text(WINDOW, "Properties: ", FONT, WHITE, info_rect.left, 510, False)
+            player.draw_player_properties(WINDOW)
+            break
 
 def draw_turn_info():
-    if game.get_turn() == 0:
-        gui.draw_text(WINDOW, "Turn: Car", FONT, WHITE, 50, 30, False)
-    elif game.get_turn() == 1:
-        gui.draw_text(WINDOW, "Turn: Shoe", FONT, WHITE, 50, 30, False)
-    elif game.get_turn() == 2:
-        gui.draw_text(WINDOW, "Turn: Ship", FONT, WHITE, 50, 30, False)
-    elif game.get_turn() == 3:
-        gui.draw_text(WINDOW, "Turn: Hat", FONT, WHITE, 50, 30, False)
-    elif game.get_turn() == 4:
-        gui.draw_text(WINDOW, "Turn: Ship", FONT, WHITE, 50, 30, False)
+    for player in players:
+        if player.is_player_turn(game.get_turn()): 
+            gui.draw_text(WINDOW, "Turn: "+player.get_name(), FONT, WHITE, 50, 30, False)
+            break
         
 def draw(selected_option):
     WINDOW.fill(BLACK)
@@ -317,9 +305,8 @@ def draw_widgets():
     WINDOW.blit(textbox2.get_surface(), (760, 400 - textbox2.get_fontsize()))
     player_option.draw(WINDOW)
     
-
-
-# drawings two sided arrow for trading
+    
+# draw two sided arrow for trading
 arrow_offset_x = 900 #initialize variables here so it is not called every frame
 arrow_offset_y = 365
 arrowscale = 8
@@ -338,15 +325,6 @@ def draw_trading_area():
                          (200/arrowscale+arrow_offset_x, 100/arrowscale+ arrow_offset_y)))
     pygame.draw.line(WINDOW, WHITE, (950, 400), (950+115, 400), width=4)
     pygame.draw.line(WINDOW, WHITE, (760, 400), (760+115, 400), width=4)
-
-
-
-def RepresentsInt(s):
-    try: 
-        int(s)
-        return True
-    except ValueError:
-        return False
     
 def main():
     clock = pygame.time.Clock()
@@ -368,66 +346,61 @@ def main():
             current_option = selected_option
         
         for event in events:
-            if event.type == pygame.MOUSEBUTTONUP:
-                if event.button == 1:
-                    if roll_button.is_clicked(event):
-                        if not game.roll_complete() and not game.is_player_in_jail():
-                            die.roll()
-                            game.set_dice_roll(die.get_rollsum(), die.is_double())
-                        roll_button.release()
-                    
-                    elif buy_button.is_clicked(event):
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                if roll_button.is_clicked(event) and not game.roll_complete() and not game.is_player_in_jail():
+                    die.roll()
+                    game.set_dice_roll(die.get_rollsum(), die.is_double())
+                
+                elif buy_button.is_clicked(event):
+                    for player in players:
+                        loc = property_dict["locations"][player.get_position()]["name"]
+                        if player.is_player_turn(game.get_turn()) and loc not in special_locs:
+                            pos = player.get_position()
+                            col = property_dict["locations"][pos]["color"]
+                            cost = property_dict["locations"][pos]["cost"]
+                            player.buy_property(pos, col, cost)
+                            break
+                
+                elif build_button.is_clicked(event) and textbox.represents_int():
+                    pos = int(textbox.get_text())
+                    if len(property_dict["locations"]) >= pos and "house_price" in property_dict["locations"][pos]:
+                        color = property_dict["locations"][pos]["color"]
                         for player in players:
-                            loc = property_dict["locations"][player.get_position()]["name"]
-                            if player.is_player_turn(game.get_turn()) and loc not in special_locs:
-                                pos = player.get_position()
-                                col = property_dict["locations"][pos]["color"]
-                                cost = property_dict["locations"][pos]["cost"]
-                                player.buy_property(pos, col, cost)
+                            if player.is_player_turn(game.get_turn()) and player.has_color_group(color):
+                                color_property = property_dict["locations"][pos]["friend_id"] # property in same color group as location where house is being built
+                                house_price = property_dict["locations"][pos]["house_price"]
+                                if "friend_id2" in property_dict["locations"][pos]:
+                                    color_property2 = property_dict["locations"][pos]["friend_id2"]
+                                    player.buy_house(pos, color, house_price, color_property, color_property2)
+                                else:
+                                    player.buy_house(pos, color, house_price, color_property)
                                 break
-                    
-                    elif build_button.is_clicked(event):
-                        if textbox.represents_int():
-                            pos = int(textbox.get_text())
-                            if len(property_dict["locations"]) >= pos and "house_price" in property_dict["locations"][pos]:
-                                color = property_dict["locations"][pos]["color"]
-                                for player in players:
-                                    if player.is_player_turn(game.get_turn()) and player.has_color_group(color):
-                                        color_property = property_dict["locations"][pos]["friend_id"] # property in same color group as location where house is being built
-                                        house_price = property_dict["locations"][pos]["house_price"]
-                                        if "friend_id2" in property_dict["locations"][pos]:
-                                            color_property2 = property_dict["locations"][pos]["friend_id2"]
-                                            player.buy_house(pos, color, house_price, color_property, color_property2)
-                                        else:
-                                            player.buy_house(pos, color, house_price, color_property)
-                                        break
+                        
+                elif analysis_button.is_clicked(event):
+                    pass
+                
+                elif textbox.is_clicked(event):
+                    textbox.set_enabled(True)
+                
+                elif textbox2.is_clicked(event):
+                    textbox2.set_enabled(True)  
+                
+                elif end_turn_button.is_clicked(event):
+                    game.change_turn()
+                    for player in players:
+                        if player.is_player_turn(game.get_turn()):
+                            current_option = player.get_turn_number()
+                            player_option.set_selected_option(current_option)
+                            break
+                        
+                elif bail_button.is_clicked(event):
+                    for player in players:
+                        if player.is_player_turn(game.get_turn()) and player.is_in_jail():
+                            player.pay(50)
+                            player.leave_jail()
+                            break
                             
-                    elif analysis_button.is_clicked(event):
-                        pass
-                    
-                    elif textbox.is_clicked(event):
-                        textbox.set_enabled(True)
-                    
-                    elif textbox2.is_clicked(event):
-                        textbox2.set_enabled(True)  
-                    
-                    elif end_turn_button.is_clicked(event):
-                        game.change_turn()
-                        for player in players:
-                            if player.is_player_turn(game.get_turn()):
-                                current_option = player.get_turn_number()
-                                player_option.set_selected_option(current_option)
-                                break
-                            
-                    elif bail_button.is_clicked(event):
-                        for player in players:
-                            if player.is_player_turn(game.get_turn()) and player.is_in_jail():
-                                player.pay(50)
-                                player.leave_jail()
-                                break
-                            
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN: # When enter is pressed it exits out of typing mode for the text boxes
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:  # When enter is pressed it exits out of typing mode for the text boxes
                     if textbox.is_enabled():
                         textbox.set_enabled(False)
                     elif textbox2.is_enabled():
