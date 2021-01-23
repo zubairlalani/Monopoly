@@ -43,12 +43,13 @@ class Player:
     """Single player for a monopoly game
     """
     owned_properties = set()
-    def __init__(self, name, money, x, y):
+    def __init__(self, name, money, x, y, turn_number):
         self.name = name
         self.money = money
         self.properties = set()
         self.color_frequency = {}
         self.houses = {}
+        self.turn_number = turn_number
         
         self.position = 0
         self.x = x
@@ -156,6 +157,14 @@ class Player:
     
     def is_in_jail(self):
         return self.in_jail
+    
+    def is_player_turn(self, turn):
+        if self.turn_number == turn:
+            return True
+        return False
+    
+    def get_turn_number(self):
+        return self.turn_number
     
     def get_money(self):
         return self.money
