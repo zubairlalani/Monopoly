@@ -119,7 +119,6 @@ class Player:
         self.money -= amount
     
     def has_color_group(self, color):
-        print(self.color_frequency)
         if color in self.color_frequency:
             if (color == "Brown" or color == "Dark Blue") and self.color_frequency[color] == 2:
                 return True
@@ -188,7 +187,6 @@ class Player:
 
     def draw_houses(self, window, property_id, rect):
         if self.get_property_house_amount(property_id) > 0 and self.get_property_house_amount(property_id) < 5:
-                #gui.draw_text(WINDOW, str(self.get_property_house_amount(1)), FONT, GREEN, rect.centerx, rect.centery, True)
                 house = pygame.Rect(rect.x, rect.y, OWNED_PROPERTY_WIDTH/4, OWNED_PROPERTY_WIDTH/4)
                 for x in range(self.get_property_house_amount(property_id)):
                     pygame.draw.rect(window, DARK_GREEN, house)
@@ -196,127 +194,83 @@ class Player:
         elif self.get_property_house_amount(property_id) == 5:
             hotel = pygame.Rect(rect.x, rect.y, OWNED_PROPERTY_WIDTH, 5)
             pygame.draw.rect(window, DARK_RED, hotel)
+    
+    def draw_owned_property(self, window, rect, pos, color):
+        if self.property_owned(pos):
+            pygame.draw.rect(window, color, rect)
+            self.draw_houses(window, pos, rect)
+        else:
+            pygame.draw.rect(window, color, rect, 2)
         
-    def draw_player_properties(self, WINDOW, FONT):
+    def draw_player_properties(self, WINDOW):
+        
         
         rect = pygame.Rect(ROW_ONE_START, ROW_ONE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(1): # Mediterranean Ave.
-            pygame.draw.rect(WINDOW, BROWN, rect) # Filled in rectangle when property is owned
-            self.draw_houses(WINDOW, 1, rect)
-        else:
-            pygame.draw.rect(WINDOW, BROWN, rect, 2) # Have only border of rectangle if property is unowned
+        self.draw_owned_property(WINDOW, rect, 1, BROWN) # Mediterranean Ave.
         
         rect = pygame.Rect(ROW_ONE_START + CARD_DIST, ROW_ONE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(3): # Baltic Ave.
-            pygame.draw.rect(WINDOW, BROWN, rect)
-            self.draw_houses(WINDOW, 3, rect)
-        else:
-            pygame.draw.rect(WINDOW, BROWN, rect, 2)
+        self.draw_owned_property(WINDOW, rect, 3, BROWN) # Baltic Ave.
         
         rect = pygame.Rect(ROW_MIDDLE, ROW_ONE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(6): # Oriental Ave.
-            pygame.draw.rect(WINDOW, LIGHTBLUE, rect)
-            self.draw_houses(WINDOW, 6, rect)
-        else:
-            pygame.draw.rect(WINDOW, LIGHTBLUE, rect, 2)
+        self.draw_owned_property(WINDOW, rect, 6, LIGHTBLUE) # Oriental Ave.
         
         rect = pygame.Rect(ROW_MIDDLE + CARD_DIST, ROW_ONE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(8): # Vermont Ave.
-            pygame.draw.rect(WINDOW, LIGHTBLUE, rect)
-            self.draw_houses(WINDOW, 8, rect)
-        else:
-            pygame.draw.rect(WINDOW, LIGHTBLUE, rect, 2)
+        self.draw_owned_property(WINDOW, rect, 8, LIGHTBLUE) # Vermont Ave.
             
         rect = pygame.Rect(ROW_MIDDLE + 2*CARD_DIST, ROW_ONE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(9): # Connecticut Ave.
-            pygame.draw.rect(WINDOW, LIGHTBLUE, rect)
-            self.draw_houses(WINDOW, 9, rect)
-        else:
-            pygame.draw.rect(WINDOW, LIGHTBLUE, rect, 2)
+        self.draw_owned_property(WINDOW, rect, 9, LIGHTBLUE) # Connecticut Ave.
         
         rect = pygame.Rect(ROW_ONE_END, ROW_ONE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(11): # St. Charles Place
-            pygame.draw.rect(WINDOW, PINK, rect)
-            self.draw_houses(WINDOW, 11, rect)
-        else:
-            pygame.draw.rect(WINDOW, PINK, rect, 2)
+        self.draw_owned_property(WINDOW, rect, 11, PINK) # St. Charles Place
         
         rect = pygame.Rect(ROW_ONE_END + CARD_DIST, ROW_ONE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(13): # States Ave.
-            pygame.draw.rect(WINDOW, PINK, rect)
-            self.draw_houses(WINDOW, 13, rect)
-        else:
-            pygame.draw.rect(WINDOW, PINK, rect, 2)
+        self.draw_owned_property(WINDOW, rect, 13, PINK) # States Ave.
         
         rect = pygame.Rect(ROW_ONE_END + 2*CARD_DIST, ROW_ONE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(14): # Virginia Ave.
-            pygame.draw.rect(WINDOW, PINK, rect)
-            self.draw_houses(WINDOW, 14, rect)
-        else:
-            pygame.draw.rect(WINDOW, PINK, rect, 2)
+        self.draw_owned_property(WINDOW, rect, 14, PINK) # Virginia Ave.
         
         rect = pygame.Rect(ROW_TWO_START, ROW_TWO_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(16):  # St. James Place
-            pygame.draw.rect(WINDOW, ORANGE, rect)
-            self.draw_houses(WINDOW, 16, rect)
-        else:
-            pygame.draw.rect(WINDOW, ORANGE, rect, 2)
+        self.draw_owned_property(WINDOW, rect, 16, ORANGE) # St. James Place
            
         rect =  pygame.Rect(ROW_TWO_START + CARD_DIST, ROW_TWO_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(18): # Tennessee Ave.
-            pygame.draw.rect(WINDOW, ORANGE, rect)
-            self.draw_houses(WINDOW, 18, rect)
-        else:
-            pygame.draw.rect(WINDOW, ORANGE, rect, 2)
+        self.draw_owned_property(WINDOW, rect, 18, ORANGE) # Tennessee Ave.
         
         rect =  pygame.Rect(ROW_TWO_START + 2*CARD_DIST, ROW_TWO_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(19): # New York Ave.
-            pygame.draw.rect(WINDOW, ORANGE, rect)
-            self.draw_houses(WINDOW, 19, rect)
-        else:
-            pygame.draw.rect(WINDOW, ORANGE, rect, 2)
+        self.draw_owned_property(WINDOW, rect, 19, ORANGE) # New York Ave.
         
         rect = pygame.Rect(ROW_MIDDLE, ROW_TWO_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(21): # Kentucky Ave.
-            pygame.draw.rect(WINDOW, RED, rect)
-            self.draw_houses(WINDOW, 21, rect)
-        else:
-            pygame.draw.rect(WINDOW, RED, rect, 2)
+        self.draw_owned_property(WINDOW, rect, 21, RED) # Kentucky Ave.
         
         rect = pygame.Rect(ROW_MIDDLE + CARD_DIST, ROW_TWO_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(23): # Indiana Ave.
-            pygame.draw.rect(WINDOW, RED, rect)
-            self.draw_houses(WINDOW, 23, rect)
-        else:
-            pygame.draw.rect(WINDOW, RED, rect, 2)
+        self.draw_owned_property(WINDOW, rect, 23, RED) # Indiana Ave.
         
         rect = pygame.Rect(ROW_MIDDLE + 2*CARD_DIST, ROW_TWO_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(24): # Illinois Ave.
-            pygame.draw.rect(WINDOW, RED, rect)
-            self.draw_houses(WINDOW, 24, rect)
-        else:
-            pygame.draw.rect(WINDOW, RED, rect, 2)
+        self.draw_owned_property(WINDOW, rect, 24, RED) # Illinois Ave.
         
         rect = pygame.Rect(ROW_TWO_END, ROW_TWO_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(26): # Atlantic Ave.
-            pygame.draw.rect(WINDOW, YELLOW, rect)
-            self.draw_houses(WINDOW, 26, rect)
-        else:
-            pygame.draw.rect(WINDOW, YELLOW, rect, 2)
+        self.draw_owned_property(WINDOW, rect, 26, YELLOW) # Atlantic Ave.
         
         rect = pygame.Rect(ROW_TWO_END + CARD_DIST, ROW_TWO_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(27): # Ventnor Ave.
-            pygame.draw.rect(WINDOW, YELLOW, rect)
-            self.draw_houses(WINDOW, 27, rect)
-        else:
-            pygame.draw.rect(WINDOW, YELLOW, rect, 2)
+        self.draw_owned_property(WINDOW, rect, 27, YELLOW) # Ventnor Ave.
         
         rect = pygame.Rect(ROW_TWO_END + 2*CARD_DIST, ROW_TWO_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(29): # Marvin Gardens
-            pygame.draw.rect(WINDOW, YELLOW, rect)
-            self.draw_houses(WINDOW, 29, rect)
-        else:
-            pygame.draw.rect(WINDOW, YELLOW, rect, 2)
+        self.draw_owned_property(WINDOW, rect, 29, YELLOW) # Marvin Gardens
+        
+        
+        rect = pygame.Rect(ROW_MIDDLE, ROW_THREE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
+        self.draw_owned_property(WINDOW, rect, 31, GREEN) # Pacific Ave.
+        
+        rect = pygame.Rect(ROW_MIDDLE + CARD_DIST, ROW_THREE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
+        self.draw_owned_property(WINDOW, rect, 32, GREEN) # North Carolina Ave.
+        
+        rect = pygame.Rect(ROW_MIDDLE + 2*CARD_DIST, ROW_THREE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
+        self.draw_owned_property(WINDOW, rect, 34, GREEN) # Pennsylvania Ave.
+        
+        rect = pygame.Rect(ROW_THREE_END, ROW_THREE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
+        self.draw_owned_property(WINDOW, rect, 37, DARKBLUE) # Park Place
+         
+        rect = pygame.Rect(ROW_THREE_END + CARD_DIST, ROW_THREE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
+        self.draw_owned_property(WINDOW, rect, 39, DARKBLUE) # Boardwalk
         
         #UTILITIES
         if self.property_owned(12): # Electric Community
@@ -338,43 +292,7 @@ class Player:
         else:
             water_works_rect = pygame.Rect(ROW_THREE_START + CARD_DIST, ROW_THREE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
             pygame.draw.rect(WINDOW, WHITE, water_works_rect, 2)
-        
-        rect = pygame.Rect(ROW_MIDDLE, ROW_THREE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(31): # Pacific Ave.
-            pygame.draw.rect(WINDOW, GREEN, rect)
-            self.draw_houses(WINDOW, 31, rect)
-        else:
-            pygame.draw.rect(WINDOW, GREEN, rect, 2)
-        
-        rect = pygame.Rect(ROW_MIDDLE + CARD_DIST, ROW_THREE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(32): # North Carolina Ave.
-            pygame.draw.rect(WINDOW, GREEN, rect)
-            self.draw_houses(WINDOW, 32, rect)
-        else:
-            pygame.draw.rect(WINDOW, GREEN, rect, 2)
-        
-        rect = pygame.Rect(ROW_MIDDLE + 2*CARD_DIST, ROW_THREE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(34): # Pennsylvania Ave.
-            pygame.draw.rect(WINDOW, GREEN, rect)
-            self.draw_houses(WINDOW, 34, rect)
-        else:
-            pygame.draw.rect(WINDOW, GREEN, rect, 2)
-        
-        rect = pygame.Rect(ROW_THREE_END, ROW_THREE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(37): # Park Place
-            pygame.draw.rect(WINDOW, DARKBLUE, rect)
-            self.draw_houses(WINDOW, 37, rect)
-        else:
-            pygame.draw.rect(WINDOW, DARKBLUE, rect, 2)
-         
-        rect = pygame.Rect(ROW_THREE_END + CARD_DIST, ROW_THREE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
-        if self.property_owned(39): # Boardwalk
-            pygame.draw.rect(WINDOW, DARKBLUE, rect)
-            self.draw_houses(WINDOW, 39, rect)
-        else:
-            pygame.draw.rect(WINDOW, DARKBLUE, rect, 2)
-        
-        
+            
         #RAILROADS
         if self.property_owned(5): # Reading Railroad
             reading_railroad_rect = pygame.Rect(ROW_MIDDLE - CARD_DIST/2, ROW_FOUR_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)

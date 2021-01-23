@@ -142,32 +142,25 @@ class GameEngine:
     
     def set_dice_roll(self, dice_roll, double):
         self.dice_roll = dice_roll
-        if self.get_turn() == 0:
-            car.move(dice_roll) # Move the player the sum of the roll
-        elif self.get_turn() == 1:
-            shoe.move(dice_roll)
-        elif self.get_turn() == 2:
-            pass
-        elif self.get_turn() == 3:
-            pass
+        for player in players:
+            if player.is_player_turn(self.turn):
+                player.move(dice_roll) # Move the player the sum of the roll
+                break
         
         if double:
             self.doubles += 1
             if self.doubles == 3: # When three doubles are rolled, player goes to jail
-                if self.get_turn() == 0:
-                    car.go_to_jail()
-                elif self.get_turn() == 1:
-                    shoe.go_to_jail()
-                elif self.get_turn() == 2:
-                    pass
-                elif self.get_turn() == 3:
-                    pass
+                for player in players:
+                    if player.is_player_turn(self.turn):
+                        player.go_to_jail()
+                        break
                 self.doubles == 0
                 self.rollled = True
         else:
             self.rollled = True
         
         self.check_player_pos()
+        
     def roll_complete(self):
         return self.rollled
     
@@ -270,17 +263,15 @@ def draw_player_info(selected_option):
     if selected_option == 0:
         gui.draw_text(WINDOW, "Wealth: $"+str(car.get_money()), FONT, WHITE, info_rect.left, 475, False)
         gui.draw_text(WINDOW, "Properties: ", FONT, WHITE, info_rect.left, 510, False)
-        car.draw_player_properties(WINDOW, FONT)
+        car.draw_player_properties(WINDOW)
     elif selected_option == 1:
         gui.draw_text(WINDOW, "Wealth: $"+str(shoe.get_money()), FONT, WHITE, info_rect.left, 475, False)
         gui.draw_text(WINDOW, "Properties: ", FONT, WHITE, info_rect.left, 510, False)
-        shoe.draw_player_properties(WINDOW, FONT)
+        shoe.draw_player_properties(WINDOW)
     elif selected_option == 2:
         pass
-   
-def draw(selected_option):
-    WINDOW.fill(BLACK)
 
+def draw_turn_info():
     if game.get_turn() == 0:
         gui.draw_text(WINDOW, "Turn: Car", FONT, WHITE, 50, 30, False)
     elif game.get_turn() == 1:
@@ -289,7 +280,14 @@ def draw(selected_option):
         gui.draw_text(WINDOW, "Turn: Ship", FONT, WHITE, 50, 30, False)
     elif game.get_turn() == 3:
         gui.draw_text(WINDOW, "Turn: Hat", FONT, WHITE, 50, 30, False)
+    elif game.get_turn() == 4:
+        gui.draw_text(WINDOW, "Turn: Ship", FONT, WHITE, 50, 30, False)
         
+def draw(selected_option):
+    WINDOW.fill(BLACK)
+
+    draw_turn_info()
+    
     WINDOW.blit(BOARD_IMAGE, board_rect)
     WINDOW.blit(CAR, (car.get_x(), car.get_y()))
     WINDOW.blit(SHOE, (shoe.get_x(), shoe.get_y()))
@@ -320,12 +318,13 @@ def draw_widgets():
     player_option.draw(WINDOW)
     
 
+
 # drawings two sided arrow for trading
 arrow_offset_x = 900 #initialize variables here so it is not called every frame
 arrow_offset_y = 365
 arrowscale = 8
-
 def draw_trading_area():
+    # Draw a double sided arrow and two lines to indicate the text input areas
     pygame.draw.polygon(WINDOW, WHITE, 
                         (
                          (arrow_offset_x, 100/arrowscale + arrow_offset_y), (arrow_offset_x, arrow_offset_y), 
@@ -388,27 +387,30 @@ def main():
                                 break
                     
                     elif build_button.is_clicked(event):
-                        if RepresentsInt(textbox.get_text()):
+                        if textbox.represents_int():
                             pos = int(textbox.get_text())
                             if len(property_dict["locations"]) >= pos and "house_price" in property_dict["locations"][pos]:
                                 color = property_dict["locations"][pos]["color"]
                                 for player in players:
                                     if player.is_player_turn(game.get_turn()) and player.has_color_group(color):
                                         color_property = property_dict["locations"][pos]["friend_id"] # property in same color group as location where house is being built
-                                        
+                                        house_price = property_dict["locations"][pos]["house_price"]
                                         if "friend_id2" in property_dict["locations"][pos]:
                                             color_property2 = property_dict["locations"][pos]["friend_id2"]
-                                            player.buy_house(pos, color, property_dict["locations"][pos]["house_price"], color_property, color_property2)
+                                            player.buy_house(pos, color, house_price, color_property, color_property2)
                                         else:
-                                            player.buy_house(pos, color, property_dict["locations"][pos]["house_price"], color_property)
+                                            player.buy_house(pos, color, house_price, color_property)
                                         break
                             
                     elif analysis_button.is_clicked(event):
                         pass
+                    
                     elif textbox.is_clicked(event):
                         textbox.set_enabled(True)
+                    
                     elif textbox2.is_clicked(event):
                         textbox2.set_enabled(True)  
+                    
                     elif end_turn_button.is_clicked(event):
                         game.change_turn()
                         for player in players:
@@ -430,6 +432,7 @@ def main():
                         textbox.set_enabled(False)
                     elif textbox2.is_enabled():
                         textbox2.set_enabled(False)     
+            
             elif event.type == pygame.QUIT:
                 run = False
         

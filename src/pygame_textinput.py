@@ -179,6 +179,13 @@ class TextInput:
     def get_text(self):
         return self.input_string
 
+    def represents_int(self):
+        try: 
+            int(self.get_text())
+            return True
+        except ValueError:
+            return False
+    
     def get_fontsize(self):
         return self.font_size
     
