@@ -124,6 +124,8 @@ class GameEngine:
                                 rent = 10 * self.dice_roll
                             else:
                                 rent = 4 * self.dice_roll
+                        elif player.get_position() == 5 or player.get_position() == 15 or player.get_position() == 25 or player.get_position() == 35: # railroads
+                            pass # rent based on railroads
                         else:
                             rent = property_dict["locations"][player.get_position()]["rent"]
                             if other_player.has_color_group(property_dict["locations"][player.get_position()]["color"]):
@@ -246,7 +248,7 @@ textbox = pygame_textinput.TextInput("", font_size=20, text_color=WHITE,
                                      cursor_color=ORANGE, max_string_length=18, rect=pygame.Rect(950, 370, 110, 30))
 textbox2 = pygame_textinput.TextInput("", font_size=20, text_color=WHITE,
                                       cursor_color=ORANGE, max_string_length=18, rect=pygame.Rect(760, 370, 110, 30))
-player_option = gui.OptionBox(760, 435, 310, 30, GREY, (100, 200, 255), FONT, ["Car", "Shoe", "Ship", "Hat"])
+player_option = gui.OptionBox(760, 435, 310, 30, GREY, (100, 200, 255), FONT, ["Car", "Shoe", "Ship", ])
 
 car = Player("Car", 40000, START_X, START_Y, 0)
 shoe = Player("Shoe", 40000, START_X, START_Y, 1)
@@ -268,7 +270,7 @@ def draw_player_info(selected_option):
 def draw_turn_info():
     for player in players:
         if player.is_player_turn(game.get_turn()): 
-            gui.draw_text(WINDOW, "Turn: "+player.get_name(), FONT, WHITE, 50, 30, False)
+            gui.draw_text(WINDOW, "Turn: " + player.get_name(), FONT, WHITE, 50, 30, False)
             break
         
 def draw(selected_option):
