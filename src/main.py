@@ -17,6 +17,7 @@ pygame.font.init()
 
 # Define important colors
 FONT = pygame.font.Font(None, 30)
+SMALLFONT = pygame.font.Font(None, 20)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREY = (155, 155, 155)
@@ -255,21 +256,34 @@ end_turn_button = gui.Button(WINDOW, "End Turn", FONT, ORANGE, pygame.Rect(1110,
 bail_button = gui.Button(WINDOW, "Pay Bail", FONT, (0, 0, 255), pygame.Rect(1110-250, 200, 100, 60), (255, 0, 0))
 
 textbox = pygame_textinput.TextInput("", font_size=20, text_color=WHITE,
-                                     cursor_color=ORANGE, max_string_length=18, rect=pygame.Rect(950, 370, 110, 30))
+                                     cursor_color=ORANGE, max_string_length=22, rect=pygame.Rect(920, 350, 115, 30))
 textbox2 = pygame_textinput.TextInput("", font_size=20, text_color=WHITE,
-                                      cursor_color=ORANGE, max_string_length=18, rect=pygame.Rect(760, 370, 110, 30))
-player_option = gui.OptionBox(760, 435, 310, 30, GREY, (100, 200, 255), FONT, ["Car", "Shoe", "Ship", ])
+                                      cursor_color=ORANGE, max_string_length=18, rect=pygame.Rect(920, 385, 110, 30))
 
 car = Player("Car", 40000, START_X, START_Y, 0)
 shoe = Player("Shoe", 40000, START_X, START_Y, 1)
 players = [car, shoe]
 
-die = Dice(pygame.Rect(1100+30, 50, 60, 60), pygame.Rect(1100+30, 120, 60, 60), BUTTON_COLOR, 30)
+options = []
 game = GameEngine(2)
+for player in players:
+    options.append(player.get_name())
+print(options)
+player_option = gui.OptionBox(760, 435, 310, 30, GREY, (100, 200, 255), FONT, options)
+options2 = options.copy()
+options2.pop(0)
+player_option.print_option_list()
+trade_optionbox = gui.OptionBox(770, 370, 110, 20, GREY, (100, 200, 255), SMALLFONT, options2)
+trade_optionbox2 = gui.OptionBox(770, 400, 110, 20, GREY, (100, 200, 255), SMALLFONT, options2)
+
+die = Dice(pygame.Rect(1100+30, 50, 60, 60), pygame.Rect(1100+30, 120, 60, 60), BUTTON_COLOR, 30)
+
 
 def draw_player_info(selected_option):
     info_rect = pygame.Rect(760, 435, 310, 300)
     pygame.draw.rect(WINDOW, WHITE, info_rect, 2)
+    #pygame.draw.rect(WINDOW, WHITE, pygame.Rect(920, 350, 115, 30), 2)
+    #pygame.draw.rect(WINDOW, WHITE, pygame.Rect(920, 385, 115, 30), 2)
     for player in players:
         if selected_option == player.get_turn_number():
             gui.draw_text(WINDOW, "Wealth: $"+str(player.get_money()), FONT, WHITE, info_rect.left, 475, False)
@@ -313,31 +327,110 @@ def draw_widgets():
     if (game.get_turn() == 0 and car.is_in_jail()) or (game.get_turn() == 1 and shoe.is_in_jail()):
         bail_button.draw()
         
-    WINDOW.blit(textbox.get_surface(), (950, 400 - textbox.get_fontsize()))
-    WINDOW.blit(textbox2.get_surface(), (760, 400 - textbox2.get_fontsize()))
+    WINDOW.blit(textbox.get_surface(), (textbox.get_rect().left, textbox.get_rect().centery))#(950, 400 - textbox.get_fontsize()))
+    WINDOW.blit(textbox2.get_surface(), (textbox2.get_rect().left, textbox2.get_rect().centery))
     player_option.draw(WINDOW)
+    trade_optionbox2.draw(WINDOW)
+    #trade_optionbox.draw(WINDOW)
+    for player in players:
+        if player.is_player_turn(game.get_turn()):
+            gui.draw_text(WINDOW, player.get_name(), FONT, (255, 0, 255), 825, 380, True)
+    
     
     
 # draw two sided arrow for trading
-arrow_offset_x = 900 #initialize variables here so it is not called every frame
+arrow_offset_x = 873 #initialize variables here so it is not called every frame
 arrow_offset_y = 365
 arrowscale = 8
 def draw_trading_area():
-    # Draw a double sided arrow and two lines to indicate the text input areas
-    pygame.draw.polygon(WINDOW, WHITE, 
-                        (
-                         (arrow_offset_x, 100/arrowscale + arrow_offset_y), (arrow_offset_x, arrow_offset_y), 
-                         (-100/arrowscale + arrow_offset_x, 150/arrowscale + arrow_offset_y), 
-                         (arrow_offset_x, 300/arrowscale + arrow_offset_y), 
-                         (arrow_offset_x, 200/arrowscale+ arrow_offset_y), 
-                         (200/arrowscale+arrow_offset_x, 200/arrowscale + arrow_offset_y), 
-                         (200/arrowscale+arrow_offset_x, 300/arrowscale + arrow_offset_y), 
-                         (300/arrowscale +arrow_offset_x, 150/arrowscale + arrow_offset_y), 
-                         (200/arrowscale + arrow_offset_x, 0+ arrow_offset_y), 
-                         (200/arrowscale+arrow_offset_x, 100/arrowscale+ arrow_offset_y)))
-    pygame.draw.line(WINDOW, WHITE, (950, 400), (950+115, 400), width=4)
-    pygame.draw.line(WINDOW, WHITE, (760, 400), (760+115, 400), width=4)
+
+    pygame.draw.line(WINDOW, WHITE, (920, 380), (950+115, 380), width=4)
+    pygame.draw.line(WINDOW, WHITE, (920, 413), (950+115, 413), width=4)
     
+def is_money(s):
+    if len(s) > 0 and s[0] == "$":
+        return True
+    return False
+
+def determine_property_id(property_name):
+    pos_counter = 0
+    for index in property_dict["locations"]:
+        if index["name"] == property_name:
+            break
+        pos_counter += 1
+    return pos_counter
+
+def handle_trade():
+    can_trade = False
+    if is_money(textbox.get_text()) and not is_money(textbox2.get_text()): # Trade money for property
+        money = int(textbox.get_text()[1:])
+        traded_property = determine_property_id(textbox2.get_text())
+        if  len(property_dict["locations"]) > traded_property: # make sure the property being traded is a location on the board
+            # Confirm that the players can in fact trade (have the funds and properties required)
+            for player in players:
+                if player.get_name() == trade_optionbox2.get_selected_option():
+                    if player.property_owned(traded_property):
+                        can_trade = True
+                    else:
+                        can_trade = False
+                elif player.is_player_turn(game.get_turn()):
+                    can_trade = player.can_afford(money)
+            
+            if can_trade:
+                for player in players:
+                    if player.is_player_turn(game.get_turn()):
+                        player.pay(money)
+                        player.add_property(traded_property, property_dict["locations"][traded_property]["color"])                    
+                    elif player.get_name() == trade_optionbox2.get_selected_option():
+                        player.make_deposit(money)
+                        player.remove_property(traded_property, property_dict["locations"][traded_property]["color"])
+    elif not is_money(textbox.get_text()) and is_money(textbox2.get_text()): # Trade property for money
+        money = int(textbox2.get_text()[1:])
+        traded_property = determine_property_id(textbox.get_text())
+        if  len(property_dict["locations"]) > traded_property: # make sure the property being traded is a location on the board
+            # Confirm that the players can in fact trade (have the funds and properties required)
+            for player in players:
+                if player.is_player_turn(game.get_turn()):
+                    if player.property_owned(traded_property):
+                        can_trade = True
+                    else:
+                        can_trade = False
+                elif player.get_name() == trade_optionbox2.get_selected_option():
+                    can_trade = player.can_afford(money)
+            
+            if can_trade:
+                for player in players:
+                    if player.is_player_turn(game.get_turn()):
+                        player.make_deposit(money)
+                        player.remove_property(traded_property, property_dict["locations"][traded_property]["color"])          
+                    elif player.get_name() == trade_optionbox2.get_selected_option():
+                        player.pay(money)
+                        player.add_property(traded_property, property_dict["locations"][traded_property]["color"])    
+                        
+    elif not is_money(textbox.get_text()) and not is_money(textbox2.get_text()): # Trade properties
+        traded_property = determine_property_id(textbox.get_text())
+        traded_property2 = determine_property_id(textbox2.get_text())
+        if  len(property_dict["locations"]) > traded_property and len(property_dict["locations"]) > traded_property2: # make sure the property being traded is a location on the board
+            # Confirm that the players can in fact trade (have the funds and properties required)
+            for player in players:
+                if player.get_name() == trade_optionbox2.get_selected_option():
+                    if player.property_owned(traded_property2):
+                        can_trade = True
+                    else:
+                        can_trade = False
+                elif player.is_player_turn(game.get_turn()):
+                    if player.property_owned(traded_property):
+                        can_trade = True
+                    else:
+                        can_trade = False
+            if can_trade:
+                for player in players:
+                    if player.is_player_turn(game.get_turn()):
+                        player.add_property(traded_property2, property_dict["locations"][traded_property2]["color"])
+                        player.remove_property(traded_property, property_dict["locations"][traded_property]["color"])          
+                    elif player.get_name() == trade_optionbox2.get_selected_option():
+                        player.add_property(traded_property, property_dict["locations"][traded_property]["color"])
+                        player.remove_property(traded_property2, property_dict["locations"][traded_property2]["color"]) 
 def main():
     clock = pygame.time.Clock()
     run = True
@@ -346,6 +439,7 @@ def main():
         clock.tick(FPS)
         events = pygame.event.get()
         selected_option = player_option.update(events)
+        trading_partner = trade_optionbox2.update(events)
         
         for event in events:
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
@@ -363,9 +457,14 @@ def main():
                             player.buy_property(pos, col, cost)
                             break
                 
-                elif build_button.is_clicked(event) and textbox.represents_int():
-                    pos = int(textbox.get_text())
-                    if len(property_dict["locations"]) >= pos and "house_price" in property_dict["locations"][pos]:
+                elif trade_button.is_clicked(event):
+                    handle_trade()
+                elif build_button.is_clicked(event):
+                    
+                    pos = determine_property_id(textbox.get_text())
+                    print(pos)
+                    
+                    if len(property_dict["locations"]) > pos and "house_price" in property_dict["locations"][pos]:
                         color = property_dict["locations"][pos]["color"]
                         for player in players:
                             if player.is_player_turn(game.get_turn()) and player.has_color_group(color):
@@ -387,12 +486,15 @@ def main():
                 elif textbox2.is_clicked(event):
                     textbox2.set_enabled(True)  
                 
-                elif end_turn_button.is_clicked(event):
+                elif end_turn_button.is_clicked(event) and game.roll_complete():
                     game.change_turn()
+                    option_list = []
                     for player in players:
                         if player.is_player_turn(game.get_turn()):
                             player_option.set_selected_option(player.get_turn_number())
-                            break
+                        else:
+                            option_list.append(player.get_name())
+                    trade_optionbox2.set_option_list(option_list)
                         
                 elif bail_button.is_clicked(event):
                     for player in players:

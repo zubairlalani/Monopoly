@@ -31,6 +31,7 @@ class OptionBox():
         self.rect = pygame.Rect(x, y, w, h)
         self.font = font
         self.option_list = option_list
+        print(self.option_list)
         self.selected = selected
         self.draw_menu = False
         self.menu_active = False
@@ -81,7 +82,16 @@ class OptionBox():
     
     def set_selected_option(self, index):
         self.selected = index
-        
+    
+    def set_option_list(self, option_list):
+        self.option_list = option_list
+    
+    def print_option_list(self):
+        print(self.option_list)
+    
+    def get_selected_option(self):
+        return self.option_list[self.selected]
+    
 def draw_text(window, text, font, color, x, y, centered):
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect()

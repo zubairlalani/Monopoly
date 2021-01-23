@@ -176,6 +176,9 @@ class TextInput:
     def get_surface(self):
         return self.surface
 
+    def get_rect(self):
+        return self.rect
+    
     def get_text(self):
         return self.input_string
 

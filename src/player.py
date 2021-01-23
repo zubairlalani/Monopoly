@@ -83,12 +83,8 @@ class Player:
     
     def buy_property(self, property_id, property_color, price):
         if self.money - price >= 0 and property_id not in Player.owned_properties:
-            self.properties.add(property_id)
             Player.owned_properties.add(property_id)
-            if property_color in self.color_frequency:
-                self.color_frequency[property_color] += 1
-            else:
-                self.color_frequency[property_color] = 1
+            self.add_property(property_id, property_color)
             
             self.money -= price
     
@@ -116,7 +112,25 @@ class Player:
         self.money += amount
     
     def pay(self, amount):
-        self.money -= amount
+        if self.money - amount >= 0:
+            self.money -= amount
+    
+    def can_afford(self, amount):
+        if self.money - amount >= 0:
+            return True
+        return False
+    
+    def add_property(self, property_id, property_color):
+        self.properties.add(property_id)
+        if property_color in self.color_frequency:
+            self.color_frequency[property_color] += 1
+        else:
+            self.color_frequency[property_color] = 1
+        
+    
+    def remove_property(self, property_id, property_color):
+        self.properties.remove(property_id)
+        self.color_frequency[property_color] -= 1
     
     def has_color_group(self, color):
         if color in self.color_frequency:
