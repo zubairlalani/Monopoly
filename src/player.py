@@ -126,6 +126,9 @@ class Player:
                 return True
         return False
     
+    def get_number_of_group_owned(self, group):
+        return self.color_frequency[group]
+    
     def get_property_house_amount(self, property_id):
         if property_id not in self.houses:
             return 0

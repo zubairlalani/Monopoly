@@ -77,7 +77,7 @@ class OptionBox():
                     self.selected = self.active_option
                     self.draw_menu = False
                     return self.active_option
-        return -1
+        return self.selected
     
     def set_selected_option(self, index):
         self.selected = index

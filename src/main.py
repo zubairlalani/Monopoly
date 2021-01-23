@@ -125,7 +125,17 @@ class GameEngine:
                             else:
                                 rent = 4 * self.dice_roll
                         elif player.get_position() == 5 or player.get_position() == 15 or player.get_position() == 25 or player.get_position() == 35: # railroads
-                            pass # rent based on railroads
+                            number_of_railroads = other_player.get_number_of_group_owned("RR")
+                            if number_of_railroads == 1:
+                                rent = property_dict["locations"][player.get_position()]["rent"]
+                            elif number_of_railroads == 2:
+                                rent = property_dict["locations"][player.get_position()]["rent1"]
+                            elif number_of_railroads == 3:
+                                rent = property_dict["locations"][player.get_position()]["rent2"]
+                            elif number_of_railroads == 4:
+                                rent = property_dict["locations"][player.get_position()]["rent3"]
+                                
+                            
                         else:
                             rent = property_dict["locations"][player.get_position()]["rent"]
                             if other_player.has_color_group(property_dict["locations"][player.get_position()]["color"]):
@@ -332,20 +342,10 @@ def main():
     clock = pygame.time.Clock()
     run = True
     
-    current_option = 0
-    
     while run:
         clock.tick(FPS)
-        
         events = pygame.event.get()
-        
-        
         selected_option = player_option.update(events)
-        # Makes sure that when an option is selected, it stay selected until a new option is picked
-        if selected_option == -1:
-            selected_option = current_option
-        if selected_option != -1:
-            current_option = selected_option
         
         for event in events:
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
@@ -391,8 +391,7 @@ def main():
                     game.change_turn()
                     for player in players:
                         if player.is_player_turn(game.get_turn()):
-                            current_option = player.get_turn_number()
-                            player_option.set_selected_option(current_option)
+                            player_option.set_selected_option(player.get_turn_number())
                             break
                         
                 elif bail_button.is_clicked(event):
