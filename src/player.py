@@ -1,6 +1,7 @@
 import pygame
 import os
 import gui_components as gui
+
 CARD_DIST = 30
 LEFT_MARGIN = 16
 COLOR_GROUP_DIST = 20
@@ -34,9 +35,12 @@ DARKBLUE = (0, 34, 204)
 GREY = (155, 155, 155)
 ORANGE = (255, 180, 0)
 
-WATER_DROPLET_IMAGE = pygame.image.load(os.path.join('Assets', 'water_droplet.png'))
-LIGHTBULB_IMAGE = pygame.image.load(os.path.join('Assets', 'lightbulb.png'))
-RAILROAD_IMAGE = pygame.image.load(os.path.join('Assets', 'railroad_icon.jpeg'))
+CAR = pygame.image.load("/Users/zubairlalani/Desktop/MonopolyAnalysis/assets/car.png")
+SHOE = pygame.image.load("/Users/zubairlalani/Desktop/MonopolyAnalysis/assets/shoe.png")
+player_images = [CAR, SHOE]
+WATER_DROPLET_IMAGE = pygame.image.load("/Users/zubairlalani/Desktop/MonopolyAnalysis/assets/water_droplet.png")
+LIGHTBULB_IMAGE = pygame.image.load("/Users/zubairlalani/Desktop/MonopolyAnalysis/assets/lightbulb.png")
+RAILROAD_IMAGE = pygame.image.load("/Users/zubairlalani/Desktop/MonopolyAnalysis/assets/railroad_icon.jpeg")
 railroad_icon_rect = RAILROAD_IMAGE.get_rect()
 
 class Player:
@@ -57,7 +61,10 @@ class Player:
         
         self.in_jail = False
         self.jail_turns = 0
-                 
+        
+    def draw(self, window):
+        window.blit(player_images[self.turn_number], (self.x, self.y)) 
+             
     def move(self, dice_roll):
         temp_pos = self.position
         self.position += dice_roll
@@ -220,7 +227,6 @@ class Player:
             pygame.draw.rect(window, color, rect, 2)
         
     def draw_player_properties(self, WINDOW):
-        
         
         rect = pygame.Rect(ROW_ONE_START, ROW_ONE_Y, OWNED_PROPERTY_WIDTH, OWNED_PROPERTY_HEIGHT)
         self.draw_owned_property(WINDOW, rect, 1, BROWN) # Mediterranean Ave.

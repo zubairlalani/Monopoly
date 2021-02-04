@@ -108,7 +108,7 @@ class GameEngine:
                     player.pay(100)
                 elif player.get_position() == 2 or player.get_position() == 17 or player.get_position() == 33: # Community Chest spots
                     pass
-                elif player.get_position() == 7 or player.get_position() == 22 or car.get_position() == 36: # Chance spots
+                elif player.get_position() == 7 or player.get_position() == 22 or player.get_position() == 36: # Chance spots
                     pass
                 
                 for other_player in players:
@@ -312,7 +312,9 @@ def draw(selected_option):
         WINDOW.blit(property_images[car.get_position()], (785, 60))
     elif game.get_turn() == 1 and shoe.get_position() in property_images:
         WINDOW.blit(property_images[shoe.get_position()], (785, 60))
-    draw_trading_area()
+    #Two lines for trading area
+    pygame.draw.line(WINDOW, WHITE, (920, 380), (950+115, 380), width=4)
+    pygame.draw.line(WINDOW, WHITE, (920, 413), (950+115, 413), width=4)
     
     
 def draw_widgets():
@@ -334,18 +336,7 @@ def draw_widgets():
     #trade_optionbox.draw(WINDOW)
     for player in players:
         if player.is_player_turn(game.get_turn()):
-            gui.draw_text(WINDOW, player.get_name(), FONT, (255, 0, 255), 825, 380, True)
-    
-    
-    
-# draw two sided arrow for trading
-arrow_offset_x = 873 #initialize variables here so it is not called every frame
-arrow_offset_y = 365
-arrowscale = 8
-def draw_trading_area():
-
-    pygame.draw.line(WINDOW, WHITE, (920, 380), (950+115, 380), width=4)
-    pygame.draw.line(WINDOW, WHITE, (920, 413), (950+115, 413), width=4)
+            gui.draw_text(WINDOW, player.get_name(), FONT, (255, 0, 255), 825, 380, True) 
     
 def is_money(s):
     if len(s) > 0 and s[0] == "$":
