@@ -3,9 +3,10 @@ import threading
 import pickle
 import pygame
 from player import Player
+import time
 
 HEADER = 64
-PORT = 5050
+PORT = 5555
 SERVER = "192.168.1.214"
 #SERVER = socket.gethostbyname(socket.gethostname())
 ADDR = (SERVER, PORT)
@@ -19,7 +20,7 @@ try:
 except socket.error as e:
     str(e)
 
-s.listen()
+s.listen(2)
 print("Waiting for a connection....Server Started!")
 
 connected = set()
@@ -29,38 +30,38 @@ START_X, START_Y = 640, 670 # Starting position of a player
 car = Player("Car", 40000, START_X, START_Y, 0)
 shoe = Player("Shoe", 40000, START_X, START_Y, 1)
 players = [car, shoe]
+turn = 0
+dice_rolls = ["?", "?", "0"]
 
 def threaded_client(conn, player):
     conn.send(pickle.dumps(players[player]))
     reply = ""
-    string_data = False
+    global turn
+    
     while True:
         try:
-            data = pickle.loads(conn.recv(2048 * 14))
-            if isinstance(data, str):
-                string_data = True
-                print("RECEIVED: " + data)
-            else:
-                string_data = False
-                players[player] = data
-            #turn = conn.recv(4096).decode()
-            
+            data = pickle.loads(conn.recv(1024 * 10))
+            players[player] = data[0]
             if not data:
                 print("Disconnected")
                 break
-            else:
-                if string_data == False:
-                    if player == 1:
-                        reply = players[0]
-                    else:
-                        reply = players[1]
+            else:        
+                if player == 1:
+                    reply = players[0]
+                    if dice_rolls[2] == str(player):
+                        dice_rolls[2] = data[1]
+                        dice_rolls[0] = data[2]
+                        dice_rolls[1] = data[3] 
+                    
                 else:
-                    reply = "Hello"
-                #print("Received: ", data)
-                #print("Sending : ", reply)
-             
-            conn.sendall(pickle.dumps(reply))
-            #conn.sendall(str.encode(turn))
+                    reply = players[1]
+                    if dice_rolls[2] == str(player):
+                        dice_rolls[2] = data[1]
+                        dice_rolls[0] = data[2]
+                        dice_rolls[1] = data[3]
+                  
+            rep = [reply, dice_rolls[2], dice_rolls[0], dice_rolls[1]]
+            conn.sendall(pickle.dumps(rep))
             
         except:
             break

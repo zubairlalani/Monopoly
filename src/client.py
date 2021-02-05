@@ -1,13 +1,14 @@
 import pygame
 import os
 import json
-import random
+
 
 from network import Network
 from player import Player
 import sys
 import pygame_textinput
 import gui_components as gui
+import dice
 
 #Setting up pygame
 WINDOW_WIDTH, WINDOW_HEIGHT = 1250, 800
@@ -161,8 +162,9 @@ class GameEngine:
     
     def set_dice_roll(self, dice_roll, double, player):
         self.dice_roll = dice_roll
-        print(player.get_name() + " : " + str(player.get_turn_number()))
+        print(player.get_name() + " : " + str(player.get_turn_number()) + str(self.turn) + str(self.dice_roll))
         if player.is_player_turn(self.turn):
+            print("ABOUT TO MOVE")
             player.move(dice_roll) # Move the player the sum of the roll
         
         if double:
@@ -176,7 +178,9 @@ class GameEngine:
             self.rollled = True
         
         #self.check_player_pos()
-        
+    def set_dice(self, dice_roll):
+        self.dice_roll = dice_roll
+            
     def roll_complete(self):
         return self.rollled
     
@@ -190,55 +194,7 @@ class GameEngine:
                 player.leave_jail()
             return player.is_in_jail()
             
-class Dice:
-    """Represents the die within the monopoly game and handles both drawing and rolling the die
-    """
-    
-    def __init__(self, dice_rect, dice2_rect, color, fontsize):
-        """Initialize class variables and the surfaces for drawing the numbers
 
-        Args:
-            dice_rect (pygame.Rect): Rectangle that represents the first dice
-            dice2_rect (Pygame.Rect): Rectangle that represents the second dice
-            color (Tuple): Color that dice will be drawn with
-            fontsize (int): Size of the numbers within the rectangles
-        """
-        self.dice_one = '?'
-        self.dice_two = '?'
-        self.dice_rect = dice_rect
-        self.dice2_rect = dice2_rect
-        
-        self.color = color
-        self.fontsize = fontsize
-        
-        self.surface = FONT.render(self.dice_one, True, ORANGE)
-        self.surface2 = FONT.render(self.dice_two, True, ORANGE)
-        
-        self.text_rect = self.surface.get_rect()
-        self.text_rect.center = self.dice_rect.center
-        self.text2_rect = self.surface2.get_rect()
-        self.text2_rect.center = self.dice2_rect.center
-        
-    def roll(self):
-        self.dice_one = str(random.randint(1, 6))
-        self.dice_two = str(random.randint(1, 6))
-        self.surface = FONT.render(self.dice_one, True, ORANGE)
-        self.surface2 = FONT.render(self.dice_two, True, ORANGE)
-    
-    def is_double(self):
-        if self.dice_one == self.dice_two:
-            return True
-        return False
-    
-    def draw_dice(self):
-        pygame.draw.rect(WINDOW, self.color, self.dice_rect, 2)
-        pygame.draw.rect(WINDOW, self.color, self.dice2_rect, 2)
-        WINDOW.blit(self.surface, self.text_rect)
-        WINDOW.blit(self.surface2, self.text2_rect)
-    
-    def get_rollsum(self):
-        return int(self.dice_one) + int(self.dice_two)
-    
 # Initialize GUI components and players
 roll_button = gui.Button(WINDOW, 'Roll', FONT, ORANGE, pygame.Rect(1110, 200, 100, 60), BUTTON_COLOR)
 buy_button = gui.Button(WINDOW, 'Buy', FONT, ORANGE, pygame.Rect(1110, 280, 100, 60), BUTTON_COLOR)
@@ -254,20 +210,28 @@ textbox = pygame_textinput.TextInput("", font_size=20, text_color=WHITE,
 textbox2 = pygame_textinput.TextInput("", font_size=20, text_color=WHITE,
                                       cursor_color=ORANGE, max_string_length=18, rect=pygame.Rect(920, 385, 110, 30))
 game = GameEngine(2)
-die = Dice(pygame.Rect(1100+30, 50, 60, 60), pygame.Rect(1100+30, 120, 60, 60), BUTTON_COLOR, 30)
+die = dice.Dice(pygame.Rect(1100+30, 50, 60, 60), pygame.Rect(1100+30, 120, 60, 60), BUTTON_COLOR, 30)
 
 
 def redrawWindow(WINDOW, player, player2):
     WINDOW.fill(BLACK)
     WINDOW.blit(BOARD_IMAGE, board_rect)
-    player.draw(WINDOW)
+    info_rect = pygame.Rect(760, 435, 310, 300)
+    pygame.draw.rect(WINDOW, WHITE, info_rect, 2) # Player property box
+    
+    # Draw two players and their properties
+    player.draw(WINDOW) 
     player2.draw(WINDOW)
+    player.draw_player_properties(WINDOW)
+    player2.draw_player_properties(WINDOW)
+    
+    # Draw different buttons on the side
     draw_widgets() 
     pygame.display.update()
 
 def draw_widgets():
     roll_button.draw()
-    die.draw_dice()
+    die.draw_dice(WINDOW)
     buy_button.draw()
     trade_button.draw()
     build_button.draw()
@@ -288,10 +252,15 @@ def main():
     
     while run:
         clock.tick(FPS)
-        p2 = n.send(p)
+        send_objs_list = [p, str(game.get_turn()), die.get_dice_one(), die.get_dice_two()]
+        data = n.send(send_objs_list)  
+        p2 = data[0]
+        print(str(data[1]) + " " + str(game.get_turn()))
+        #game.set_turn(data[1])
+        die.set_dice(data[2], data[3])
+        #print(self.dice_one + " " + self.dice_two)
         events = pygame.event.get()
-        #game.set_turn(n.send_string(game.get_turn()))
-        #print(game.get_turn())
+        
         for event in events:
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 if roll_button.is_clicked(event) and not game.roll_complete() and not game.is_player_in_jail(p):
@@ -300,8 +269,6 @@ def main():
                 
                 elif end_turn_button.is_clicked(event) and game.roll_complete():
                     game.change_turn()
-                    print("TESTING")
-                    print(n.send_string("HIIIIIIIII"))
                     
                     '''
                     option_list = []
