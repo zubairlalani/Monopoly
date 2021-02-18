@@ -42,6 +42,7 @@ def threaded_client(conn, player):
         try:
             data = pickle.loads(conn.recv(1024 * 10))
             players[player] = data[0]
+            
             if not data:
                 print("Disconnected")
                 break
@@ -49,14 +50,18 @@ def threaded_client(conn, player):
                 if player == 1:
                     reply = players[0]
                     if dice_rolls[2] == str(player):
-                        dice_rolls[2] = data[1]
+                        if data[1] != "x":
+                            dice_rolls[2] = data[1]
+                            print("SWITCHING TURNS: ", dice_rolls[2])
                         dice_rolls[0] = data[2]
                         dice_rolls[1] = data[3] 
                     
                 else:
                     reply = players[1]
                     if dice_rolls[2] == str(player):
-                        dice_rolls[2] = data[1]
+                        if data[1] != "x":
+                            dice_rolls[2] = data[1]
+                            print("SWITCHING TURNS: ", dice_rolls[2])
                         dice_rolls[0] = data[2]
                         dice_rolls[1] = data[3]
                   

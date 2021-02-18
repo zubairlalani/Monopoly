@@ -249,16 +249,23 @@ def main():
     clock = pygame.time.Clock()
     n = Network() 
     p = n.get_p()
-    
+    switch_turn = False
     while run:
         clock.tick(FPS)
-        send_objs_list = [p, str(game.get_turn()), die.get_dice_one(), die.get_dice_two()]
+        
+        send_objs_list = []
+        if switch_turn:
+            send_objs_list = [p, str(game.get_turn()), die.get_dice_one(), die.get_dice_two()]
+            switch_turn = False
+        else:
+            send_objs_list = [p, "x", die.get_dice_one(), die.get_dice_two()]
+            
         data = n.send(send_objs_list)  
         p2 = data[0]
-        print(str(data[1]) + " " + str(game.get_turn()))
-        #game.set_turn(data[1])
+        print(str(data[1]))
+        game.set_turn(int(data[1]))
         die.set_dice(data[2], data[3])
-        #print(self.dice_one + " " + self.dice_two)
+        
         events = pygame.event.get()
         
         for event in events:
@@ -269,7 +276,7 @@ def main():
                 
                 elif end_turn_button.is_clicked(event) and game.roll_complete():
                     game.change_turn()
-                    
+                    switch_turn = True
                     '''
                     option_list = []
                     if player.is_player_turn(game.get_turn()):
