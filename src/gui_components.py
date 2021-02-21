@@ -83,6 +83,9 @@ class OptionBox():
     def set_selected_option(self, index):
         self.selected = index
     
+    def get_option_list(self):
+        return self.option_list
+    
     def set_option_list(self, option_list):
         self.option_list = option_list
     
@@ -91,7 +94,7 @@ class OptionBox():
     
     def get_selected_option(self):
         return self.option_list[self.selected]
-    
+
 def draw_text(window, text, font, color, x, y, centered):
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect()

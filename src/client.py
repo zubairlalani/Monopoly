@@ -194,7 +194,9 @@ class GameEngine:
                 player.leave_jail()
             return player.is_in_jail()
             
-
+    def get_player_amount(self):
+        return self.amount_of_players
+    
 # Initialize GUI components and players
 roll_button = gui.Button(WINDOW, 'Roll', FONT, ORANGE, pygame.Rect(1110, 200, 100, 60), BUTTON_COLOR)
 buy_button = gui.Button(WINDOW, 'Buy', FONT, ORANGE, pygame.Rect(1110, 280, 100, 60), BUTTON_COLOR)
@@ -209,21 +211,51 @@ textbox = pygame_textinput.TextInput("", font_size=20, text_color=WHITE,
                                      cursor_color=ORANGE, max_string_length=22, rect=pygame.Rect(920, 350, 115, 30))
 textbox2 = pygame_textinput.TextInput("", font_size=20, text_color=WHITE,
                                       cursor_color=ORANGE, max_string_length=18, rect=pygame.Rect(920, 385, 110, 30))
+
+options = [] # Harcoded for now
 game = GameEngine(2)
+
+player_option = gui.OptionBox(760, 435, 310, 30, GREY, (100, 200, 255), FONT, options)
+
+options2 = []
+
+trade_optionbox = gui.OptionBox(770, 370, 110, 20, GREY, (100, 200, 255), SMALLFONT, options2)
+trade_optionbox2 = gui.OptionBox(770, 400, 110, 20, GREY, (100, 200, 255), SMALLFONT, options2)  
+
 die = dice.Dice(pygame.Rect(1100+30, 50, 60, 60), pygame.Rect(1100+30, 120, 60, 60), BUTTON_COLOR, 30)
 
 
-def redrawWindow(WINDOW, player, player2):
+def redrawWindow(WINDOW, player, player2, selected_option):
     WINDOW.fill(BLACK)
     WINDOW.blit(BOARD_IMAGE, board_rect)
+    if (player.is_player_turn(game.get_turn())):
+        gui.draw_text(WINDOW, "Turn: " + player.get_name(), FONT, WHITE, 50, 30, False)
+    else:
+        gui.draw_text(WINDOW, "Turn: " + player2.get_name(), FONT, WHITE, 50, 30, False)
+    
     info_rect = pygame.Rect(760, 435, 310, 300)
     pygame.draw.rect(WINDOW, WHITE, info_rect, 2) # Player property box
     
     # Draw two players and their properties
     player.draw(WINDOW) 
     player2.draw(WINDOW)
-    player.draw_player_properties(WINDOW)
-    player2.draw_player_properties(WINDOW)
+    #player.draw_player_properties(WINDOW)
+    
+    if selected_option == player.get_turn_number():
+        gui.draw_text(WINDOW, "Wealth: $"+str(player.get_money()), FONT, WHITE, info_rect.left, 475, False)
+        gui.draw_text(WINDOW, "Properties: ", FONT, WHITE, info_rect.left, 510, False)
+        player.draw_player_properties(WINDOW)
+    else:
+        gui.draw_text(WINDOW, "Wealth: $"+str(player2.get_money()), FONT, WHITE, info_rect.left, 475, False)
+        gui.draw_text(WINDOW, "Properties: ", FONT, WHITE, info_rect.left, 510, False)
+        player2.draw_player_properties(WINDOW)
+    
+    #player2.draw_player_properties(WINDOW)
+    
+    if player.is_player_turn(game.get_turn()) and player.get_position() in property_images:
+        WINDOW.blit(property_images[player.get_position()], (785, 60))
+    elif player2.is_player_turn(game.get_turn()) and player2.get_position() in property_images:
+        WINDOW.blit(property_images[player2.get_position()], (785, 60))
     
     # Draw different buttons on the side
     draw_widgets() 
@@ -238,9 +270,11 @@ def draw_widgets():
     mortgage_button.draw()
     analysis_button.draw()
     end_turn_button.draw()
-     
+    
     WINDOW.blit(textbox.get_surface(), (textbox.get_rect().left, textbox.get_rect().centery))#(950, 400 - textbox.get_fontsize()))
     WINDOW.blit(textbox2.get_surface(), (textbox2.get_rect().left, textbox2.get_rect().centery))
+    player_option.draw(WINDOW)
+    trade_optionbox2.draw(WINDOW)
     pygame.draw.line(WINDOW, WHITE, (920, 380), (950+115, 380), width=4)
     pygame.draw.line(WINDOW, WHITE, (920, 413), (950+115, 413), width=4)
          
@@ -250,8 +284,11 @@ def main():
     n = Network() 
     p = n.get_p()
     switch_turn = False
+    first = True
+    
     while run:
         clock.tick(FPS)
+        
         
         send_objs_list = []
         if switch_turn:
@@ -259,38 +296,67 @@ def main():
             switch_turn = False
         else:
             send_objs_list = [p, "x", die.get_dice_one(), die.get_dice_two()]
-            
+
         data = n.send(send_objs_list)  
         p2 = data[0]
-        print(str(data[1]))
+        #print(str(data[1]))
+        
+        temp = game.get_turn()
         game.set_turn(int(data[1]))
+        if p.is_player_turn(game.get_turn()) and temp != game.get_turn():
+           player_option.set_selected_option(game.get_turn())
+           
         die.set_dice(data[2], data[3])
+        player_list = [p, p2]
+        
+        if first:
+            options = []
+            for _ in range(len(player_list)):
+                options.append(None)
+            for player in player_list:
+                options[player.get_turn_number()] = player.get_name()
+            first = False
+            player_option.set_option_list(options)
+            
+            options2 = options.copy()
+            options2.pop(p.get_turn_number())
+            #trade_optionbox.set_option_list(options2)
+            trade_optionbox2.set_option_list(options2)
+        
+        #player_option.set_option_list(options)
+        
+        
         
         events = pygame.event.get()
         
+        selected_option = player_option.update(events)
         for event in events:
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 if roll_button.is_clicked(event) and not game.roll_complete() and not game.is_player_in_jail(p):
                     die.roll()
                     game.set_dice_roll(die.get_rollsum(), die.is_double(), p)
                 
+                elif buy_button.is_clicked(event):
+                    loc = property_dict["locations"][p.get_position()]["name"]
+                    if p.is_player_turn(game.get_turn()) and loc not in special_locs:
+                        pos = p.get_position()
+                        col = property_dict["locations"][pos]["color"]
+                        cost = property_dict["locations"][pos]["cost"]
+                        p.buy_property(pos, col, cost)
+                        break
+                        
                 elif end_turn_button.is_clicked(event) and game.roll_complete():
                     game.change_turn()
                     switch_turn = True
-                    '''
-                    option_list = []
-                    if player.is_player_turn(game.get_turn()):
-                        player_option.set_selected_option(player.get_turn_number())
-                    else:
-                        option_list.append(player.get_name())
+                    player_option.set_selected_option(game.get_turn())
                     #trade_optionbox2.set_option_list(option_list)
-                    '''
+                    
                     
             elif event.type == pygame.QUIT:
                 run = False
 
         
-        redrawWindow(WINDOW, p, p2)
+        redrawWindow(WINDOW, p, p2, selected_option)
     pygame.quit()
 
 main()

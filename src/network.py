@@ -16,8 +16,8 @@ class Network:
         try:
             self.client.connect(self.addr)
             return pickle.loads(self.client.recv(1024 * 10))
-        except:
-            pass
+        except socket.error as e:
+            print(e)
     
     def send(self, data):
         try:
